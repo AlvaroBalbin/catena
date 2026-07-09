@@ -1,0 +1,55 @@
+{
+  "work": "summa-theologiae",
+  "title": "Summa Theologica",
+  "author": "Thomas Aquinas",
+  "edition": "Fathers of the English Dominican Province, 2nd rev. ed. (1920-22)",
+  "license": "public-domain",
+  "source": "https://www.newadvent.org/summa/",
+  "retrieved": "2026-07-09",
+  "structure": [
+    "part",
+    "question",
+    "article"
+  ],
+  "parts": [
+    {
+      "part": "I",
+      "slug": "i",
+      "questions": 119,
+      "articles": 584,
+      "file": "data/summa/summa-i.jsonl"
+    },
+    {
+      "part": "I-II",
+      "slug": "i-ii",
+      "questions": 114,
+      "articles": 619,
+      "file": "data/summa/summa-i-ii.jsonl"
+    },
+    {
+      "part": "II-II",
+      "slug": "ii-ii",
+      "questions": 189,
+      "articles": 917,
+      "file": "data/summa/summa-ii-ii.jsonl"
+    },
+    {
+      "part": "III",
+      "slug": "iii",
+      "questions": 90,
+      "articles": 549,
+      "file": "data/summa/summa-iii.jsonl"
+    },
+    {
+      "part": "Suppl.",
+      "slug": "suppl",
+      "questions": 99,
+      "articles": 446,
+      "file": "data/summa/summa-suppl.jsonl"
+    }
+  ],
+  "totals": {
+    "questions": 611,
+    "articles": 3115
+  }
+}

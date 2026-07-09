@@ -1,0 +1,5 @@
+# Keep corpus data byte-stable across platforms; no CRLF surprises in the text.
+*.jsonl text eol=lf
+*.json  text eol=lf
+*.py    text eol=lf
+*.md    text eol=lf
