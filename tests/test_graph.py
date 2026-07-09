@@ -41,6 +41,19 @@ def test_graph():
     # coverage stays high (no silent regression)
     assert stats["parse_rate"] > 0.95, stats["parse_rate"]
 
+    # internal article->article web
+    internal = json.load(open(os.path.join(GRAPH, "internal_refs.json"), encoding="utf-8"))
+    cited_by = json.load(open(os.path.join(GRAPH, "internal_cited_by.json"), encoding="utf-8"))
+    # the divine-nature treatise builds on the existence proof
+    citers = {c["id"] for c in cited_by["summa.st.i.q2.a3"]}
+    assert "summa.st.i.q3.a7" in citers, "expected divine-simplicity to cite the existence proof"
+    # edges resolve to real articles at a high rate, and never to a missing node
+    assert stats["internal_resolve_rate"] > 0.95, stats["internal_resolve_rate"]
+    all_ids = set(refs) | {c["id"] for lst in cited_by.values() for c in lst}
+    for src, tgts in internal.items():
+        for t in tgts:
+            assert t["id"].startswith("summa.st."), t
+
 
 if __name__ == "__main__":
     test_normalizer()

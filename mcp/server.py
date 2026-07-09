@@ -46,6 +46,8 @@ def _load_graph(name: str):
 
 _SCRIPTURE_INDEX = _load_graph("scripture_index.json")
 _ARTICLE_REFS = _load_graph("article_refs.json")
+_INTERNAL_REFS = _load_graph("internal_refs.json")
+_INTERNAL_CITED_BY = _load_graph("internal_cited_by.json")
 
 
 def _citation_to_id(citation: str) -> str | None:
@@ -104,6 +106,23 @@ def tool_article_scripture(citation: str) -> str:
     return f"{citation} rests on:\n" + "\n".join(f"  {r}" for r in refs)
 
 
+def tool_cross_references(citation: str) -> str:
+    aid = _citation_to_id(citation)
+    if not aid:
+        return f'Could not parse an ST citation from "{citation}".'
+    cites = _INTERNAL_REFS.get(aid, [])
+    citers = _INTERNAL_CITED_BY.get(aid, [])
+    if not cites and not citers:
+        return f"{citation}: no internal cross-references recorded (or unknown article)."
+    lines = [f"{citation}:"]
+    if cites:
+        lines.append(f"  cites {len(cites)} article(s): " + ", ".join(c["citation"] for c in cites))
+    if citers:
+        lines.append(f"  is cited by {len(citers)} article(s): "
+                     + ", ".join(sorted(c["citation"] for c in citers)))
+    return "\n".join(lines)
+
+
 TOOLS = [
     {
         "name": "search",
@@ -152,6 +171,17 @@ TOOLS = [
             "required": ["citation"],
         },
         "handler": lambda a: tool_article_scripture(a["citation"]),
+    },
+    {
+        "name": "cross_references",
+        "description": "List the other Summa articles an article cites and is cited "
+                       "by, e.g. 'ST I, q.2, a.3'. Walk the argument's structure.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"citation": {"type": "string"}},
+            "required": ["citation"],
+        },
+        "handler": lambda a: tool_cross_references(a["citation"]),
     },
 ]
 _HANDLERS = {t["name"]: t["handler"] for t in TOOLS}

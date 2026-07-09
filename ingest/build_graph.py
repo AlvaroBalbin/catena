@@ -21,6 +21,7 @@ import os
 from collections import Counter, defaultdict
 
 from scripture import normalize_ref
+from crossref import parse_internal_refs
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SUMMA = os.path.join(ROOT, "data", "summa")
@@ -30,9 +31,24 @@ OUT = os.path.join(ROOT, "data", "graph")
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
 
+    # load all nodes first so internal references can be resolved against the full
+    # id set (a reference to a not-yet-seen article must still resolve)
+    nodes = []
+    for f in sorted(glob.glob(os.path.join(SUMMA, "summa-*.jsonl"))):
+        for line in open(f, encoding="utf-8"):
+            nodes.append(json.loads(line))
+    meta = {n["id"]: {"citation": n["citation"], "title": n.get("title", "")} for n in nodes}
+    id_set = set(meta)
+
     # verse-level and chapter-level indices: key -> list of citing articles
     scripture_index: dict[str, list] = defaultdict(list)
     article_refs: dict[str, list] = {}
+
+    # internal article -> article edges
+    internal_refs: dict[str, list] = {}
+    internal_cited_by: dict[str, list] = defaultdict(list)
+    internal_total = internal_resolved = 0
+    in_degree = Counter()
 
     total = parsed = 0
     unparsed = Counter()
@@ -40,11 +56,25 @@ def main() -> None:
     verse_counts = Counter()
     articles = 0
 
-    for f in sorted(glob.glob(os.path.join(SUMMA, "summa-*.jsonl"))):
-        for line in open(f, encoding="utf-8"):
-            n = json.loads(line)
+    for n in nodes:
             articles += 1
             aid, cit, title = n["id"], n["citation"], n.get("title", "")
+
+            # internal cross-references (article -> article)
+            targets = []
+            for tid in parse_internal_refs(n["text"]):
+                internal_total += 1
+                if tid == aid or tid not in id_set:
+                    continue
+                internal_resolved += 1
+                targets.append(tid)
+            if targets:
+                targets = list(dict.fromkeys(targets))
+                internal_refs[aid] = [{"id": t, "citation": meta[t]["citation"]} for t in targets]
+                for t in targets:
+                    in_degree[t] += 1
+                    internal_cited_by[t].append({"id": aid, "citation": cit, "title": title})
+
             refs_here = []
             seen_keys: set[str] = set()
             for c in n.get("citations_out", []):
@@ -76,10 +106,16 @@ def main() -> None:
     # stable ordering for reproducible output
     scripture_index_sorted = {k: scripture_index[k] for k in sorted(scripture_index)}
 
+    internal_cited_by_sorted = {k: internal_cited_by[k] for k in sorted(internal_cited_by)}
+
     with open(os.path.join(OUT, "scripture_index.json"), "w", encoding="utf-8") as fh:
         json.dump(scripture_index_sorted, fh, ensure_ascii=False, indent=0)
     with open(os.path.join(OUT, "article_refs.json"), "w", encoding="utf-8") as fh:
         json.dump(article_refs, fh, ensure_ascii=False, indent=0)
+    with open(os.path.join(OUT, "internal_refs.json"), "w", encoding="utf-8") as fh:
+        json.dump(internal_refs, fh, ensure_ascii=False, indent=0)
+    with open(os.path.join(OUT, "internal_cited_by.json"), "w", encoding="utf-8") as fh:
+        json.dump(internal_cited_by_sorted, fh, ensure_ascii=False, indent=0)
 
     def top_verses(n=25):
         out = []
@@ -100,6 +136,14 @@ def main() -> None:
         "most_cited_verses": top_verses(25),
         "unparsed_count": sum(unparsed.values()),
         "unparsed_top": unparsed.most_common(20),
+        "internal_refs_total": internal_total,
+        "internal_refs_resolved": internal_resolved,
+        "internal_resolve_rate": round(internal_resolved / internal_total, 4) if internal_total else 0,
+        "internal_edges": sum(len(v) for v in internal_refs.values()),
+        "most_cited_articles": [
+            {"citation": meta[i]["citation"], "title": meta[i]["title"], "in_degree": d}
+            for i, d in in_degree.most_common(20)
+        ],
     }
     with open(os.path.join(OUT, "stats.json"), "w", encoding="utf-8") as fh:
         json.dump(stats, fh, ensure_ascii=False, indent=2)
@@ -109,6 +153,10 @@ def main() -> None:
     print(f"verse nodes: {stats['unique_verse_keys']} | chapter nodes: {stats['unique_chapter_keys']}")
     print("most-cited books:", ", ".join(f"{b}({c})" for b, c in book_counts.most_common(8)))
     print("most-cited verses:", ", ".join(f"{v['ref']}({v['count']})" for v in top_verses(6)))
+    print(f"internal edges: {stats['internal_edges']} "
+          f"({internal_resolved}/{internal_total} refs resolved to real articles)")
+    mca = stats["most_cited_articles"][:3]
+    print("most-cited articles:", ", ".join(f"{a['citation']}({a['in_degree']})" for a in mca))
 
 
 if __name__ == "__main__":

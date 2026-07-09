@@ -59,13 +59,29 @@ def by_article(query: str) -> None:
             raise SystemExit(f'could not parse an ST citation from "{query}"')
         part = m.group(1).lower().rstrip(".")
         aid = f"summa.st.{part}.q{m.group(2)}.a{m.group(3)}"
+    internal = _load("internal_refs.json")
+    cited_by = _load("internal_cited_by.json")
+
     my = refs.get(aid)
-    if not my:
-        print(f"\n{aid}: no Scripture citations recorded (or unknown id).\n")
-        return
-    print(f"\n{aid} rests on {len(my)} Scripture reference(s):\n")
-    for r in my:
-        print(f"  {r}")
+    print(f"\n{aid}")
+    if my:
+        print(f"\n  rests on {len(my)} Scripture reference(s):")
+        for r in my:
+            print(f"    {r}")
+    cites = internal.get(aid, [])
+    if cites:
+        print(f"\n  cites {len(cites)} other article(s):")
+        for c in cites:
+            print(f"    [{c['citation']}]")
+    citers = cited_by.get(aid, [])
+    if citers:
+        print(f"\n  is cited by {len(citers)} other article(s):")
+        for c in sorted(citers, key=lambda x: x["id"])[:15]:
+            print(f"    [{c['citation']}]  {c['title']}")
+        if len(citers) > 15:
+            print(f"    ... and {len(citers) - 15} more")
+    if not (my or cites or citers):
+        print("  no recorded citations (or unknown id).")
     print()
 
 
@@ -77,8 +93,13 @@ def top() -> None:
     print("\nMost-cited verses:\n")
     for v in s["most_cited_verses"][:12]:
         print(f"  {v['count']:>3}  {v['ref']}")
+    if s.get("most_cited_articles"):
+        print("\nMost-cited articles (the Summa's load-bearing arguments):\n")
+        for a in s["most_cited_articles"][:12]:
+            print(f"  {a['in_degree']:>3}  [{a['citation']}]  {a['title']}")
     print(f"\n({s['scripture_citations_parsed']} of {s['scripture_citations_total']} "
-          f"citations resolved into the graph, {s['parse_rate']*100:.1f}%.)\n")
+          f"Scripture citations and {s.get('internal_edges', 0)} internal edges "
+          f"in the graph.)\n")
 
 
 def main() -> None:

@@ -296,5 +296,111 @@
       "Ezechiel",
       1
     ]
+  ],
+  "internal_refs_total": 3814,
+  "internal_refs_resolved": 3775,
+  "internal_resolve_rate": 0.9898,
+  "internal_edges": 3775,
+  "most_cited_articles": [
+    {
+      "citation": "ST I, q.84, a.7",
+      "title": "Whether the intellect can actually understand through the intelligible species of which it is possessed, without turning to the phantasms?",
+      "in_degree": 22
+    },
+    {
+      "citation": "ST I-II, q.1, a.3",
+      "title": "Whether human acts are specified by their end?",
+      "in_degree": 21
+    },
+    {
+      "citation": "ST I-II, q.18, a.6",
+      "title": "Whether an action has the species of good or evil from its end?",
+      "in_degree": 20
+    },
+    {
+      "citation": "ST I-II, q.9, a.1",
+      "title": "Whether the will is moved by the intellect?",
+      "in_degree": 18
+    },
+    {
+      "citation": "ST I-II, q.23, a.4",
+      "title": "Whether in the same power, there are any passions, specifically different, but not contrary to one another?",
+      "in_degree": 18
+    },
+    {
+      "citation": "ST I-II, q.25, a.2",
+      "title": "Whether love is the first of the concupiscible passions?",
+      "in_degree": 18
+    },
+    {
+      "citation": "ST I-II, q.90, a.2",
+      "title": "Whether the law is always something directed to the common good?",
+      "in_degree": 18
+    },
+    {
+      "citation": "ST I-II, q.55, a.4",
+      "title": "Whether virtue is suitably defined?",
+      "in_degree": 16
+    },
+    {
+      "citation": "ST I-II, q.54, a.2",
+      "title": "Whether habits are distinguished by their objects?",
+      "in_degree": 15
+    },
+    {
+      "citation": "ST I, q.3, a.4",
+      "title": "Whether essence and existence are the same in God?",
+      "in_degree": 15
+    },
+    {
+      "citation": "ST I-II, q.3, a.8",
+      "title": "Whether man's happiness consists in the vision of the divine essence?",
+      "in_degree": 14
+    },
+    {
+      "citation": "ST I-II, q.65, a.1",
+      "title": "Whether the moral virtues are connected with one another?",
+      "in_degree": 14
+    },
+    {
+      "citation": "ST I-II, q.25, a.1",
+      "title": "Whether the irascible passions precede the concupiscible passions, or vice versa?",
+      "in_degree": 13
+    },
+    {
+      "citation": "ST I, q.2, a.3",
+      "title": "Whether God exists?",
+      "in_degree": 13
+    },
+    {
+      "citation": "ST I-II, q.22, a.3",
+      "title": "Whether passion is in the sensitive appetite rather than in the intellectual appetite, which is called the will?",
+      "in_degree": 12
+    },
+    {
+      "citation": "ST I-II, q.31, a.1",
+      "title": "Whether delight is a passion?",
+      "in_degree": 12
+    },
+    {
+      "citation": "ST I-II, q.71, a.6",
+      "title": "Whether sin is fittingly defined as a word, deed, or desire contrary to the eternal law?",
+      "in_degree": 12
+    },
+    {
+      "citation": "ST I, q.4, a.2",
+      "title": "Whether the perfections of all things are in God?",
+      "in_degree": 12
+    },
+    {
+      "citation": "ST III, q.62, a.5",
+      "title": "Whether the sacraments of the New Law derive their power from Christ's Passion?",
+      "in_degree": 12
+    },
+    {
+      "citation": "ST III, q.62, a.1",
+      "title": "Whether the sacraments are the cause of grace?",
+      "in_degree": 12
+    }
   ]
 }

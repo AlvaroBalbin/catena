@@ -28,6 +28,7 @@ def main() -> None:
         rpc(5, "tools/call", {"name": "article_scripture", "arguments": {"citation": "ST I, q.2, a.3"}}),
         rpc(6, "tools/call", {"name": "lookup_verse", "arguments": {"reference": "John 1:14"}}),
         rpc(7, "tools/call", {"name": "get_article", "arguments": {"citation": "ST I, q.1, a.1"}}),
+        rpc(8, "tools/call", {"name": "cross_references", "arguments": {"citation": "ST I, q.2, a.3"}}),
     ]
     proc = subprocess.run(
         [sys.executable, SERVER],
@@ -46,7 +47,8 @@ def main() -> None:
     assert responses[1]["result"]["serverInfo"]["name"] == "catena"
 
     names = {t["name"] for t in responses[2]["result"]["tools"]}
-    assert names == {"search", "get_article", "lookup_verse", "article_scripture"}, names
+    assert names == {"search", "get_article", "lookup_verse", "article_scripture",
+                     "cross_references"}, names
 
     grounded = responses[3]["result"]["content"][0]["text"]
     assert "ST I, q.1, a.2" in grounded and "grounded passage" in grounded
@@ -59,6 +61,9 @@ def main() -> None:
 
     article = responses[7]["result"]["content"][0]["text"]
     assert "Whether, besides philosophy" in article and "I answer that," in article
+
+    xref = responses[8]["result"]["content"][0]["text"]
+    assert "is cited by" in xref and "ST I, q.3, a.7" in xref
 
     print("OK: MCP server grounds, refuses, serves articles, and walks the graph over stdio")
 

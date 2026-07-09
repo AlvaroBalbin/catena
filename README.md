@@ -104,21 +104,32 @@ Catena is not a flat pile of text. Every Scripture reference an article makes is
 ```bash
 python demo/refs.py "John 1:14"          # every article that leans on a verse
 python demo/refs.py "Romans 5"           # every article citing a whole chapter
-python demo/refs.py --article "ST I, q.2, a.3"   # the verses an article rests on
-python demo/refs.py --top                # the Scripture the Summa leans on most
+python demo/refs.py --article "ST I, q.2, a.3"   # what an article rests on AND what cites it
+python demo/refs.py --top                # what the Summa leans on most
 ```
 
 ```
 $ python demo/refs.py --article "ST I, q.2, a.3"
-summa.st.i.q2.a3 rests on 1 Scripture reference(s):
-  Exodus 3:14
+summa.st.i.q2.a3
+  rests on 1 Scripture reference(s):
+    Exodus 3:14
+  is cited by 13 other article(s):
+    [ST I, q.3, a.7]  Whether God is altogether simple?
+    [ST I, q.25, a.3] Whether God is omnipotent?
+    ...
 ```
 
-That is the existence-of-God proof resting on the divine name, "I AM WHO I AM" -
-now a queryable edge. Across the corpus: **8,491 Scripture citations resolved
-(96.8%)** into **4,924 verse nodes**. The most-cited verse is John 1:14, "the Word
-was made flesh"; the most-cited books are Matthew, Romans, and 1 Corinthians. The
-`data/graph/` artifacts are open data in their own right.
+The existence-of-God proof rests on the divine name ("I AM WHO I AM", Exodus 3:14)
+and is the foundation the entire treatise on the divine nature builds on - now
+queryable edges. Across the corpus:
+
+- **8,491 Scripture citations** resolved (96.8%) into **4,924 verse nodes**;
+  most-cited verse John 1:14, most-cited books Matthew, Romans, 1 Corinthians.
+- **3,775 internal article-to-article edges** (99% resolved). By inbound citations
+  the load-bearing article of the whole Summa is **ST I, q.84, a.7** (the intellect
+  "turning to phantasms") - its structural backbone, made visible.
+
+The `data/graph/` artifacts are open data in their own right.
 
 ## Roadmap
 
