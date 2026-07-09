@@ -1,0 +1,300 @@
+{
+  "articles": 3115,
+  "scripture_citations_total": 8768,
+  "scripture_citations_parsed": 8491,
+  "parse_rate": 0.9684,
+  "unique_verse_keys": 4924,
+  "unique_chapter_keys": 960,
+  "most_cited_books": [
+    [
+      "Matthew",
+      801
+    ],
+    [
+      "Romans",
+      673
+    ],
+    [
+      "1 Corinthians",
+      633
+    ],
+    [
+      "Psalm",
+      591
+    ],
+    [
+      "John",
+      585
+    ],
+    [
+      "Luke",
+      412
+    ],
+    [
+      "Isaiah",
+      299
+    ],
+    [
+      "Hebrews",
+      298
+    ],
+    [
+      "Genesis",
+      284
+    ],
+    [
+      "Deuteronomy",
+      265
+    ],
+    [
+      "Sirach",
+      243
+    ],
+    [
+      "Proverbs",
+      238
+    ],
+    [
+      "Exodus",
+      224
+    ],
+    [
+      "Ephesians",
+      203
+    ],
+    [
+      "2 Corinthians",
+      196
+    ],
+    [
+      "Wisdom",
+      193
+    ],
+    [
+      "Galatians",
+      170
+    ],
+    [
+      "Job",
+      165
+    ],
+    [
+      "Acts",
+      153
+    ],
+    [
+      "1 Timothy",
+      141
+    ]
+  ],
+  "most_cited_verses": [
+    {
+      "key": "john/1/14",
+      "ref": "john 1:14",
+      "count": 23
+    },
+    {
+      "key": "matthew/22/30",
+      "ref": "matthew 22:30",
+      "count": 19
+    },
+    {
+      "key": "romans/1/20",
+      "ref": "romans 1:20",
+      "count": 19
+    },
+    {
+      "key": "romans/5/5",
+      "ref": "romans 5:5",
+      "count": 18
+    },
+    {
+      "key": "hebrews/11/6",
+      "ref": "hebrews 11:6",
+      "count": 18
+    },
+    {
+      "key": "romans/13/1",
+      "ref": "romans 13:1",
+      "count": 18
+    },
+    {
+      "key": "matthew/19/21",
+      "ref": "matthew 19:21",
+      "count": 18
+    },
+    {
+      "key": "romans/5/12",
+      "ref": "romans 5:12",
+      "count": 16
+    },
+    {
+      "key": "romans/8/29",
+      "ref": "romans 8:29",
+      "count": 16
+    },
+    {
+      "key": "john/1/16",
+      "ref": "john 1:16",
+      "count": 16
+    },
+    {
+      "key": "john/3/5",
+      "ref": "john 3:5",
+      "count": 15
+    },
+    {
+      "key": "matthew/28/19",
+      "ref": "matthew 28:19",
+      "count": 15
+    },
+    {
+      "key": "isaiah/11/2",
+      "ref": "isaiah 11:2",
+      "count": 14
+    },
+    {
+      "key": "romans/6/23",
+      "ref": "romans 6:23",
+      "count": 14
+    },
+    {
+      "key": "deuteronomy/32/4",
+      "ref": "deuteronomy 32:4",
+      "count": 14
+    },
+    {
+      "key": "galatians/4/4",
+      "ref": "galatians 4:4",
+      "count": 14
+    },
+    {
+      "key": "philippians/3/21",
+      "ref": "philippians 3:21",
+      "count": 14
+    },
+    {
+      "key": "john/17/3",
+      "ref": "john 17:3",
+      "count": 13
+    },
+    {
+      "key": "1-john/3/2",
+      "ref": "1-john 3:2",
+      "count": 13
+    },
+    {
+      "key": "1-timothy/1/5",
+      "ref": "1-timothy 1:5",
+      "count": 13
+    },
+    {
+      "key": "matthew/25/41",
+      "ref": "matthew 25:41",
+      "count": 13
+    },
+    {
+      "key": "philippians/2/7",
+      "ref": "philippians 2:7",
+      "count": 13
+    },
+    {
+      "key": "romans/1/32",
+      "ref": "romans 1:32",
+      "count": 13
+    },
+    {
+      "key": "romans/6/4",
+      "ref": "romans 6:4",
+      "count": 13
+    },
+    {
+      "key": "romans/3/25",
+      "ref": "romans 3:25",
+      "count": 13
+    }
+  ],
+  "unparsed_count": 277,
+  "unparsed_top": [
+    [
+      "Holy Writ",
+      60
+    ],
+    [
+      "Scriptures",
+      50
+    ],
+    [
+      "Divine Scriptures",
+      7
+    ],
+    [
+      "verse 16",
+      3
+    ],
+    [
+      "canonical Scriptures",
+      3
+    ],
+    [
+      "4",
+      3
+    ],
+    [
+      "Holy Scriptures",
+      3
+    ],
+    [
+      "verse 4",
+      2
+    ],
+    [
+      "Mark",
+      2
+    ],
+    [
+      "10",
+      2
+    ],
+    [
+      "Genesis",
+      2
+    ],
+    [
+      "Deuteronomy",
+      2
+    ],
+    [
+      "Sacred Scriptures",
+      2
+    ],
+    [
+      "Ecclesiasticus",
+      2
+    ],
+    [
+      "Genesis 1-2",
+      2
+    ],
+    [
+      "14:21",
+      2
+    ],
+    [
+      "last chapter of Luke",
+      2
+    ],
+    [
+      "16:19",
+      2
+    ],
+    [
+      "second canonical epistle of John (verse 4)",
+      1
+    ],
+    [
+      "Ezechiel",
+      1
+    ]
+  ]
+}

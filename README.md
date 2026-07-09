@@ -92,14 +92,43 @@ Precisely, so the claim is honest:
   retrieval-*quality* limit, not a fidelity one - the passage shown is still real,
   cited source, never invented. Semantic retrieval (below) is the fix.
 
+## Walk the golden chain (citation graph)
+
+Catena is not a flat pile of text. Every Scripture reference an article makes is an
+*edge*, so you can walk the tradition. Build the graph once
+(`python ingest/build_graph.py`), then:
+
+```bash
+python demo/refs.py "John 1:14"          # every article that leans on a verse
+python demo/refs.py "Romans 5"           # every article citing a whole chapter
+python demo/refs.py --article "ST I, q.2, a.3"   # the verses an article rests on
+python demo/refs.py --top                # the Scripture the Summa leans on most
+```
+
+```
+$ python demo/refs.py --article "ST I, q.2, a.3"
+summa.st.i.q2.a3 rests on 1 Scripture reference(s):
+  Exodus 3:14
+```
+
+That is the existence-of-God proof resting on the divine name, "I AM WHO I AM" -
+now a queryable edge. Across the corpus: **8,491 Scripture citations resolved
+(96.8%)** into **4,924 verse nodes**. The most-cited verse is John 1:14, "the Word
+was made flesh"; the most-cited books are Matthew, Romans, and 1 Corinthians. The
+`data/graph/` artifacts are open data in their own right.
+
 ## Roadmap
 
 - **Semantic retrieval** - embed the corpus so retrieval is by meaning, not
   keywords, with an honest similarity floor for refusal. Precision upgrade over the
   lexical default.
-- **Resolve internal cross-references** - the Summa constantly cites itself and
-  Scripture; `citations_out` captures Scripture now, internal `ST` links next, to
-  build the citation graph.
+- **Resolve the rest of the graph** - Scripture edges are built; internal `ST`
+  cross-references and citations of the Fathers/Aristotle are next, to complete the
+  navigable web.
+- **A fidelity benchmark** - grounded-Catholic-QA where every answer must be
+  entailed by its cited passages, scored on citation accuracy and refusal calibration.
+- **MCP grounding layer** - expose the corpus and graph as tools so any AI can
+  ground a Catholic answer in real citations, or refuse.
 - **More public-domain texts** - Church Fathers (Schaff), Douay-Rheims + Vulgate,
   pre-1930 encyclicals and councils, each with a verified `SOURCES.md` entry.
 - **Catechism** - only if/when USCCB grants written permission (see
