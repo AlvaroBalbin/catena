@@ -23,9 +23,9 @@ The name is from the *Catena Aurea*, Aquinas's "golden chain" of sourced quotati
 
 | Text | Edition / translation | Rights | Status |
 |------|----------------------|--------|--------|
-| Summa Theologica | Fathers of the English Dominican Province, 2nd ed. 1920-22 | Public domain | v1 (in progress) |
+| Summa Theologica | Fathers of the English Dominican Province, 2nd ed. 1920-22 | Public domain | in corpus (3,115 articles) |
+| Douay-Rheims Bible | Challoner revision (Project Gutenberg #1581) | Public domain | in corpus (35,786 verses, 73 books) |
 | Church Fathers | Schaff, Ante/Nicene/Post-Nicene Fathers, 1885-1900 | Public domain | roadmap |
-| Douay-Rheims Bible | Challoner revision | Public domain | roadmap |
 | Clementine Vulgate | 1592 | Public domain | roadmap |
 | Older encyclicals / councils | pre-1930 English translations | Public domain (verify per-doc) | roadmap |
 | Catechism of the Catholic Church | USCCB/LEV | **Copyright - permission track** | not redistributed; see SOURCES.md |
@@ -52,7 +52,8 @@ catena/
 No install, no keys:
 
 ```bash
-python ingest/run.py --all      # build the corpus from source (one-time, ~10 min, polite)
+python ingest/run.py --all      # build the Summa from source (one-time, ~10 min, polite)
+python ingest/bible.py          # add the Douay-Rheims Bible (35,786 verses, one fetch)
 python ingest/validate.py       # prove it: lossless, addressable, complete
 python demo/ask.py "is sacred doctrine a science"
 ```
@@ -131,6 +132,41 @@ queryable edges. Across the corpus:
 
 The `data/graph/` artifacts are open data in their own right.
 
+## The verse behind the citation
+
+The Scripture graph told you *which* articles lean on a verse. With the Douay-Rheims
+Bible in the corpus (the Challoner revision, the Bible whose Vulgate numbering the
+Summa's own citations use), those citations now resolve to the **actual verse text**,
+verbatim and cited:
+
+```bash
+python demo/refs.py "John 1:14"
+```
+
+```
+John 1:14 (Douay-Rheims, verbatim, public domain):
+
+  John 1:14  And the Word was made flesh and dwelt among us (and we saw his glory,
+             the glory as it were of the only begotten of the Father), full of grace
+             and truth.
+
+23 article(s) lean on John 1:14 (verse):
+  [ST I-II, q.108, a.1]  Whether the New Law ought to prescribe or prohibit any external acts?
+  [ST III, q.1, a.3]     Whether, if man had not sinned, God would have become incarnate?
+  ...
+```
+
+The Bible was ingested to the same three disciplines as the Summa: each of the 35,786
+verses is verbatim (lossless-verified against the source), addressable
+(`john/1/14`, the exact key the citation graph uses), and complete (all 73 books of the
+Catholic canon, every chapter, contiguous verse numbering, proven by the validator).
+Because it is the Douay-Rheims, its Vulgate psalm numbering lines up with the Summa's
+citations where a modern Bible would not - so **99.4%** of the Summa's Scripture
+citations resolve to real verse text (the small remainder are citations that reference a
+verse number the chapter does not have - garbled source citations, honestly left
+unresolved rather than forced). Provenance and the one naming seam (the Douay
+"1 Kings" = 1 Samuel convention) are documented in [`data/SOURCES.md`](data/SOURCES.md).
+
 ## Roadmap
 
 - **Semantic retrieval** - embed the corpus so retrieval is by meaning, not
@@ -152,10 +188,12 @@ only, standard stdio JSON-RPC.
 claude mcp add catena -- python /absolute/path/to/catena/mcp/server.py
 ```
 
-Tools: `search` (grounded passages or a refusal), `get_article`, `lookup_verse`,
-`article_scripture`. See [`mcp/README.md`](mcp/README.md).
-- **More public-domain texts** - Church Fathers (Schaff), Douay-Rheims + Vulgate,
-  pre-1930 encyclicals and councils, each with a verified `SOURCES.md` entry.
+Tools: `search` (grounded passages or a refusal), `get_article`, `lookup_verse`
+(now returns the verbatim Douay-Rheims verse text plus the articles that lean on it),
+`article_scripture`, `cross_references`. See [`mcp/README.md`](mcp/README.md).
+- **More public-domain texts** - Church Fathers (Schaff), the Clementine Vulgate
+  (parallel Latin), pre-1930 encyclicals and councils, each with a verified
+  `SOURCES.md` entry.
 - **Catechism** - only if/when USCCB grants written permission (see
   [`docs/catechism-permission-request.md`](docs/catechism-permission-request.md)).
 

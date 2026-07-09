@@ -27,6 +27,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "demo"))
 sys.path.insert(0, os.path.join(ROOT, "ingest"))
 from retriever import load_index  # noqa: E402
+from bible_text import verses_for  # noqa: E402
 from scripture import normalize_ref  # noqa: E402
 
 PROTOCOL_VERSION = "2024-11-05"
@@ -87,13 +88,26 @@ def tool_lookup_verse(reference: str) -> str:
     if not norm:
         return f'Could not parse a Scripture reference from "{reference}".'
     key = norm["chapter_key"] if norm["verse_start"] is None else norm["verse_keys"][0]
+
+    lines: list[str] = []
+    verses = verses_for(norm)
+    if verses:
+        lines.append(f'{norm["ref"]} (Douay-Rheims, verbatim):')
+        for d in verses:
+            lines.append(f'  {d["citation"]} {d["text"]}')
+        lines.append("")
+
     hits = _SCRIPTURE_INDEX.get(key, [])
-    if not hits:
-        return f'No article in the corpus cites {norm["ref"]}.'
-    lines = [f'{len(hits)} article(s) lean on {norm["ref"]}:']
-    for h in sorted(hits, key=lambda x: x["id"]):
-        lines.append(f'  [{h["citation"]}] {h["title"]}')
-    return "\n".join(lines)
+    if hits:
+        lines.append(f'{len(hits)} Summa article(s) lean on {norm["ref"]}:')
+        for h in sorted(hits, key=lambda x: x["id"]):
+            lines.append(f'  [{h["citation"]}] {h["title"]}')
+    elif verses:
+        lines.append(f'No Summa article cites {norm["ref"]}.')
+
+    if not lines:
+        return (f'The corpus contains no verse text and no article citing {norm["ref"]}.')
+    return "\n".join(lines).strip()
 
 
 def tool_article_scripture(citation: str) -> str:
@@ -153,8 +167,10 @@ TOOLS = [
     },
     {
         "name": "lookup_verse",
-        "description": "List every Summa article that cites a Scripture verse or "
-                       "chapter, e.g. 'John 1:14' or 'Romans 5'.",
+        "description": "Return the verbatim Douay-Rheims text of a Scripture verse or "
+                       "chapter, e.g. 'John 1:14' or 'Romans 5', together with every "
+                       "Summa article that leans on it. Cite the reference for any "
+                       "verse text you use; do not paraphrase it as your own.",
         "inputSchema": {
             "type": "object",
             "properties": {"reference": {"type": "string"}},

@@ -1,0 +1,474 @@
+{
+  "work": "douay-rheims",
+  "title": "The Holy Bible, Douay-Rheims Version",
+  "edition": "Challoner revision (1749-52)",
+  "translator": "English College at Douay/Rheims; revised by Bishop Richard Challoner",
+  "license": "public-domain",
+  "source": "https://www.gutenberg.org/cache/epub/1581/pg1581.txt",
+  "via": "Project Gutenberg eBook #1581",
+  "retrieved": "2026-07-09",
+  "structure": [
+    "testament",
+    "book",
+    "chapter",
+    "verse"
+  ],
+  "canon": "Catholic (73 books, incl. deuterocanonical)",
+  "numbering": "Septuagint/Vulgate (Douay-Rheims), aligns with the Summa's citations",
+  "scope": "verse text only; Challoner's editorial notes and chapter arguments excluded (see data/SOURCES.md)",
+  "counts": {
+    "books": 73,
+    "chapters": 1334,
+    "verses": 35786
+  },
+  "citation_graph_coverage": {
+    "cited_verse_keys": 4924,
+    "resolved_to_text": 4896,
+    "rate": 0.9943
+  },
+  "citation_graph_coverage_note": "The unresolved remainder are Summa citations that reference a verse number beyond the chapter's actual length (garbled source citations, e.g. a cited Leviticus 12:17 where Leviticus 12 has 8 verses) or the handful of psalms where New Advent's citation numbering differs from this edition's Vulgate numbering. The Bible correctly contains no such verse; nothing is missing.",
+  "numbering_normalizations": [
+    "psalms 113: continued numbering after restart at v1 -> verse 9",
+    "proverbs 12: merged duplicate verse 12"
+  ],
+  "books": [
+    {
+      "slug": "genesis",
+      "book": "Genesis",
+      "chapters": 50,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "exodus",
+      "book": "Exodus",
+      "chapters": 40,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "leviticus",
+      "book": "Leviticus",
+      "chapters": 27,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "numbers",
+      "book": "Numbers",
+      "chapters": 36,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "deuteronomy",
+      "book": "Deuteronomy",
+      "chapters": 34,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "joshua",
+      "book": "Joshua",
+      "chapters": 24,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "judges",
+      "book": "Judges",
+      "chapters": 21,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ruth",
+      "book": "Ruth",
+      "chapters": 4,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-samuel",
+      "book": "1 Samuel",
+      "chapters": 31,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-samuel",
+      "book": "2 Samuel",
+      "chapters": 24,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-kings",
+      "book": "1 Kings",
+      "chapters": 22,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-kings",
+      "book": "2 Kings",
+      "chapters": 25,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-chronicles",
+      "book": "1 Chronicles",
+      "chapters": 29,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-chronicles",
+      "book": "2 Chronicles",
+      "chapters": 36,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ezra",
+      "book": "Ezra",
+      "chapters": 10,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "nehemiah",
+      "book": "Nehemiah",
+      "chapters": 13,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "tobit",
+      "book": "Tobit",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "judith",
+      "book": "Judith",
+      "chapters": 16,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "esther",
+      "book": "Esther",
+      "chapters": 16,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "job",
+      "book": "Job",
+      "chapters": 42,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "psalms",
+      "book": "Psalm",
+      "chapters": 150,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "proverbs",
+      "book": "Proverbs",
+      "chapters": 31,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ecclesiastes",
+      "book": "Ecclesiastes",
+      "chapters": 12,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "song-of-songs",
+      "book": "Song of Songs",
+      "chapters": 8,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "wisdom",
+      "book": "Wisdom",
+      "chapters": 19,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "sirach",
+      "book": "Sirach",
+      "chapters": 51,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "isaiah",
+      "book": "Isaiah",
+      "chapters": 66,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "jeremiah",
+      "book": "Jeremiah",
+      "chapters": 52,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "lamentations",
+      "book": "Lamentations",
+      "chapters": 5,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "baruch",
+      "book": "Baruch",
+      "chapters": 6,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ezekiel",
+      "book": "Ezekiel",
+      "chapters": 48,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "daniel",
+      "book": "Daniel",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "hosea",
+      "book": "Hosea",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "joel",
+      "book": "Joel",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "amos",
+      "book": "Amos",
+      "chapters": 9,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "obadiah",
+      "book": "Obadiah",
+      "chapters": 1,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "jonah",
+      "book": "Jonah",
+      "chapters": 4,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "micah",
+      "book": "Micah",
+      "chapters": 7,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "nahum",
+      "book": "Nahum",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "habakkuk",
+      "book": "Habakkuk",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "zephaniah",
+      "book": "Zephaniah",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "haggai",
+      "book": "Haggai",
+      "chapters": 2,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "zechariah",
+      "book": "Zechariah",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "malachi",
+      "book": "Malachi",
+      "chapters": 4,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-maccabees",
+      "book": "1 Maccabees",
+      "chapters": 16,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-maccabees",
+      "book": "2 Maccabees",
+      "chapters": 15,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "matthew",
+      "book": "Matthew",
+      "chapters": 28,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "mark",
+      "book": "Mark",
+      "chapters": 16,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "luke",
+      "book": "Luke",
+      "chapters": 24,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "john",
+      "book": "John",
+      "chapters": 21,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "acts",
+      "book": "Acts",
+      "chapters": 28,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "romans",
+      "book": "Romans",
+      "chapters": 16,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-corinthians",
+      "book": "1 Corinthians",
+      "chapters": 16,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-corinthians",
+      "book": "2 Corinthians",
+      "chapters": 13,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "galatians",
+      "book": "Galatians",
+      "chapters": 6,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "ephesians",
+      "book": "Ephesians",
+      "chapters": 6,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "philippians",
+      "book": "Philippians",
+      "chapters": 4,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "colossians",
+      "book": "Colossians",
+      "chapters": 4,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-thessalonians",
+      "book": "1 Thessalonians",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-thessalonians",
+      "book": "2 Thessalonians",
+      "chapters": 3,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-timothy",
+      "book": "1 Timothy",
+      "chapters": 6,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-timothy",
+      "book": "2 Timothy",
+      "chapters": 4,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "titus",
+      "book": "Titus",
+      "chapters": 3,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "philemon",
+      "book": "Philemon",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "hebrews",
+      "book": "Hebrews",
+      "chapters": 13,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "james",
+      "book": "James",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-peter",
+      "book": "1 Peter",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-peter",
+      "book": "2 Peter",
+      "chapters": 3,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-john",
+      "book": "1 John",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-john",
+      "book": "2 John",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "3-john",
+      "book": "3 John",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "jude",
+      "book": "Jude",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "revelation",
+      "book": "Revelation",
+      "chapters": 22,
+      "testament": "New Testament"
+    }
+  ]
+}

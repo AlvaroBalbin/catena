@@ -18,7 +18,9 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "ingest"))
+sys.path.insert(0, os.path.join(ROOT, "demo"))
 from scripture import normalize_ref  # noqa: E402
+from bible_text import verses_for  # noqa: E402
 
 GRAPH = os.path.join(ROOT, "data", "graph")
 
@@ -35,10 +37,21 @@ def by_reference(query: str) -> None:
     if not norm:
         raise SystemExit(f'could not parse a Scripture reference from "{query}"')
     key = norm["chapter_key"] if norm["verse_start"] is None else norm["verse_keys"][0]
+
+    # the verse text itself (Douay-Rheims), when the Bible has been ingested
+    verses = verses_for(norm)
+    if verses:
+        print(f'\n{norm["ref"]} (Douay-Rheims, verbatim, public domain):\n')
+        for d in verses:
+            print(f'  {d["citation"]}  {d["text"]}')
+
     index = _load("scripture_index.json")
     hits = index.get(key, [])
     if not hits:
-        print(f'\nNo article in the corpus cites {norm["ref"]}.\n')
+        if verses:
+            print(f'\n(No Summa article cites {norm["ref"]}.)\n')
+        else:
+            print(f'\nNo article in the corpus cites {norm["ref"]}.\n')
         return
     scope = "chapter" if norm["verse_start"] is None else "verse"
     print(f'\n{len(hits)} article(s) lean on {norm["ref"]} ({scope}):\n')

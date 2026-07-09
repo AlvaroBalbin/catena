@@ -116,6 +116,13 @@ class Index:
 
 
 def load_index() -> Index:
+    """Build the lexical index over passage-level nodes (Summa articles now, patristic
+    sections later). Individual Bible VERSES are deliberately excluded: they are far
+    too short and numerous for this BM25 floor (they skew avgdl and the document-
+    frequency thresholds the refusal logic depends on), and they are already reachable
+    verbatim through verse resolution (lookup_verse / demo/refs) and, later, the
+    semantic index. So the demo stays a grounded search over prose, and refusal stays
+    calibrated."""
     idx = Index()
     files = sorted(glob.glob(os.path.join(CORPUS, "**", "*.jsonl"), recursive=True))
     if not files:
@@ -126,6 +133,8 @@ def load_index() -> Index:
             if not line:
                 continue
             n = json.loads(line)
+            if n.get("type") == "verse":
+                continue
             idx.add(Doc(n["id"], n["citation"], n.get("title", ""), n["text"], n.get("source", {})))
     idx.finalize()
     return idx

@@ -12,8 +12,9 @@ No third-party dependencies: stdio, newline-delimited JSON-RPC 2.0, stdlib only.
 |------|-----------------|
 | `search(query, k)` | grounded, cited passages that answer a question - or `REFUSED` if the corpus has no answer |
 | `get_article(citation)` | the full verbatim article at a citation, e.g. `ST I, q.2, a.3` |
-| `lookup_verse(reference)` | every article that leans on a verse/chapter, e.g. `John 1:14` |
+| `lookup_verse(reference)` | the verbatim Douay-Rheims text of a verse/chapter, e.g. `John 1:14`, plus every article that leans on it |
 | `article_scripture(citation)` | the Scripture an article rests on |
+| `cross_references(citation)` | the other articles an article cites and is cited by |
 
 The design intent is fidelity: `search` returns only real source and an explicit
 `REFUSED` when it has nothing, so a well-behaved client cannot use Catena to invent
@@ -24,7 +25,8 @@ Church teaching.
 Build the corpus and graph once:
 
 ```bash
-python ingest/run.py --all
+python ingest/run.py --all        # the Summa
+python ingest/bible.py            # the Douay-Rheims Bible (verse text for lookup_verse)
 python ingest/build_graph.py
 ```
 

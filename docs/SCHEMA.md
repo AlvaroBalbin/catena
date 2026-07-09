@@ -48,6 +48,39 @@ Nodes are stored as newline-delimited JSON (`.jsonl`), one node per line, plus a
 }
 ```
 
+### Verse node (Bible)
+
+The Bible's citable unit is the verse. A verse node is the same shape with no
+`segments` (a verse is atomic) and a few verse-specific fields:
+
+```jsonc
+{
+  "id": "drb.john.1.14",             // drb.<slug>.<chapter>.<verse>
+  "work": "douay-rheims",
+  "citation": "John 1:14",           // canonical modern citation (the graph's form)
+  "title": "",
+  "path": ["New Testament", "John", "Chapter 1"],
+  "type": "verse",
+  "text": "And the Word was made flesh, and dwelt among us…",  // verbatim
+  "book": "John",                    // canonical modern book name
+  "douay_book": "John",              // book name as printed in this edition; differs
+                                     //   for the historical books, e.g. "1 Kings" for
+                                     //   what modern usage calls 1 Samuel
+  "chapter": 1,
+  "verse": 14,
+  "verse_key": "john/1/14",          // the join key the citation graph uses
+  "segments": [],
+  "citations_out": [],
+  "source": { "edition": "…Challoner…", "license": "public-domain", "via": "Project Gutenberg #1581", … }
+}
+```
+
+The `verse_key` is what makes the Bible and the Summa's Scripture citations meet: a
+citation "John 1:14" normalizes to `john/1/14` (see `ingest/scripture.py`) and the verse
+node carries that exact key. Verse numbering follows the Vulgate/Douay convention the
+Summa cites; the two documented normalizations (a Vulgate psalm split and one duplicate
+label) are recorded in `data/bible/manifest.json`.
+
 ### Field rules
 
 - **`id`** - deterministic from the citation, never reused, never renumbered. This is the join key for cross-references and embeddings.

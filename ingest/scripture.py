@@ -105,6 +105,14 @@ for _name, _slug, _variants in _BOOKS_RAW:
     for _v in _variants:
         _BOOK_LOOKUP[_key(_v)] = (_name, _slug)
 
+
+def resolve_book(name: str) -> tuple[str, str] | None:
+    """Map a book name (modern OR Douay-Rheims, e.g. 'Osee', '1 Kings',
+    'Ecclesiasticus', 'Apocalypse') to (canonical display name, slug), or None if
+    unrecognized. Single source of truth for the slug map, so Bible ingest and
+    citation normalization key verses identically."""
+    return _BOOK_LOOKUP.get(_key(name))
+
 _REF = re.compile(
     r"^\s*([1-4]?\s?[A-Za-z][A-Za-z.'\s]*?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?\s*$"
 )

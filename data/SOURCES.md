@@ -20,10 +20,15 @@ Rule: if a text's redistribution rights are unclear, it does not ship. We refere
 - **License:** Public domain (published pre-1929; editor and translators long deceased, works out of copyright).
 - **Status:** not yet ingested. Rights confirmed in principle; source edition to be pinned before ingest.
 
-### Douay-Rheims Bible (roadmap)
-- **Edition:** Challoner revision (18th c.).
-- **License:** Public domain.
-- **Status:** not yet ingested.
+### Douay-Rheims Bible (Challoner revision)
+- **Translation:** Douay-Rheims, Challoner revision. Old Testament first published by the English College at Douay (1609-1610), New Testament at Rheims (1582), the whole revised and diligently compared with the Latin Vulgate by Bishop Richard Challoner, 1749-1752.
+- **License:** Public domain. The Challoner text is from the 18th century; its author and revisers are centuries deceased and the work is far out of copyright everywhere. A faithful mechanical transcription of a public-domain text adds no new copyright.
+- **Source edition used for ingest:** Project Gutenberg eBook #1581, *The Bible, Douay-Rheims, Complete* (the edition Gutenberg itself flags as the improved and more complete one, over #8300). Release date 2004, most recently updated 2026; digitization originally by Catholic Software (1999), released to Project Gutenberg as public domain. Retrieved 2026-07-09 from <https://www.gutenberg.org/ebooks/1581> (plain-text file <https://www.gutenberg.org/cache/epub/1581/pg1581.txt>).
+- **Confirmed by:** Project Gutenberg distributes it under the Project Gutenberg License with US public-domain status; the underlying Challoner translation is public domain by age.
+- **Canon and naming:** the full Catholic canon of 73 books, including the deuterocanonical books, in the Douay-Rheims naming convention (e.g. "1 Kings" = 1 Samuel, "3 Kings" = 1 Kings, "1 Paralipomenon" = 1 Chronicles, "1 Esdras" = Ezra, "Canticle of Canticles" = Song of Songs, "Ecclesiasticus" = Sirach, "Osee" = Hosea, "Apocalypse" = Revelation). Each verse node stores both the canonical modern citation used across Catena (e.g. `1 Samuel 2:2`) and the Douay book name as printed in this edition (`douay_book`), so nothing about the source naming is hidden.
+- **Numbering:** Psalms and several other books follow the Septuagint/Vulgate numbering (as the Douay-Rheims does). This is intentional and correct for this corpus: the Summa's own Scripture citations (via New Advent) use the same Vulgate numbering, so verse text and citations align. A modern Bible would mismatch on the Psalms.
+- **Scope of what is ingested (an honest boundary, not a silent one):** only the **verse text** is captured as corpus nodes, verbatim, one node per verse. Challoner's editorial apparatus that appears in the same source file - the per-book "arguments", the per-chapter summary headings, and the interspersed explanatory footnotes - is **not** included in the verse nodes, because the citable unit of Scripture is the verse, not the editor's commentary. That apparatus is public domain too and remains one fetch away in the source; it is simply out of scope for a verse corpus. No verse text is truncated or altered; only whitespace runs are collapsed, exactly as for the Summa.
+- **Attribution redistributed with the text:** "The Holy Bible, Douay-Rheims Version, Challoner revision (1749-52). Public domain. Text via Project Gutenberg eBook #1581."
 
 ### Clementine Vulgate (roadmap)
 - **Edition:** 1592 Sixto-Clementine.
