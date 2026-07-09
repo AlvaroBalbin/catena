@@ -39,8 +39,11 @@ catena/
     summa/            # ingested corpus, one file per unit + a manifest
   docs/
     SCHEMA.md         # the corpus data model
-  ingest/             # source-specific ingest scripts (source -> schema)
-  demo/               # grounded cite-or-refuse retrieval demo
+    graph/            # the citation graph (verse -> articles, article -> refs, stats)
+  ingest/             # ingest scripts, reference normalizer, graph builder, validator
+  demo/               # grounded cite-or-refuse retrieval + graph-walking tools
+  mcp/                # MCP server: ground any AI in the corpus
+  tests/              # grounding, graph, and MCP smoke tests
   LICENSE             # MIT (covers the CODE only; text licenses are per-source)
 ```
 
@@ -127,8 +130,19 @@ was made flesh"; the most-cited books are Matthew, Romans, and 1 Corinthians. Th
   navigable web.
 - **A fidelity benchmark** - grounded-Catholic-QA where every answer must be
   entailed by its cited passages, scored on citation accuracy and refusal calibration.
-- **MCP grounding layer** - expose the corpus and graph as tools so any AI can
-  ground a Catholic answer in real citations, or refuse.
+
+## Ground any AI in it (MCP)
+
+Catena ships an MCP server so any assistant (Claude, etc.) can ground a Catholic
+answer in real, cited source - or be told the corpus does not contain it. Stdlib
+only, standard stdio JSON-RPC.
+
+```bash
+claude mcp add catena -- python /absolute/path/to/catena/mcp/server.py
+```
+
+Tools: `search` (grounded passages or a refusal), `get_article`, `lookup_verse`,
+`article_scripture`. See [`mcp/README.md`](mcp/README.md).
 - **More public-domain texts** - Church Fathers (Schaff), Douay-Rheims + Vulgate,
   pre-1930 encyclicals and councils, each with a verified `SOURCES.md` entry.
 - **Catechism** - only if/when USCCB grants written permission (see
