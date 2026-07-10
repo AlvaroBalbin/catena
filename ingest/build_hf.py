@@ -125,6 +125,51 @@ def build_internal_edges(out):
     return _write_jsonl(rows, os.path.join(out, "internal_edges.jsonl"))
 
 
+def _catena_nodes():
+    for f in sorted(glob.glob(os.path.join(DATA, "catena", "*.jsonl"))):
+        yield from _read_jsonl(f)
+
+
+def build_catena(out):
+    """One row per Catena Aurea pericope: the verse it comments on, the Fathers in the
+    chain, and their full verbatim commentary."""
+    rows = []
+    for d in _catena_nodes():
+        fathers = list(dict.fromkeys(s.get("father", "") for s in d["segments"] if s.get("father")))
+        path = d.get("path", [])
+        rows.append({
+            "id": d["id"],
+            "citation": d["citation"],
+            "gospel": path[1] if len(path) > 1 else "",
+            "lemma": d.get("lemma", ""),
+            "text": d["text"],
+            "fathers": ", ".join(fathers),
+            "n_fragments": len(d["segments"]),
+            "commented_verse_keys": d.get("commented_verse_keys", []),
+            "license": (d.get("source") or {}).get("license", "public-domain"),
+        })
+    return _write_jsonl(rows, os.path.join(out, "catena_aurea.jsonl"))
+
+
+def build_father_edges(out):
+    """The patristic golden chain as edges: one row per (Catena pericope -> Gospel verse
+    it comments on), with the Fathers who speak. The inverse of scripture_edges for the
+    Fathers - which Fathers weigh in on which verse."""
+    rows = []
+    for d in _catena_nodes():
+        fathers = ", ".join(dict.fromkeys(s.get("father", "") for s in d["segments"] if s.get("father")))
+        for vk in d.get("commented_verse_keys", []):
+            slug, ch, v = vk.split("/")
+            rows.append({
+                "pericope_id": d["id"],
+                "pericope_citation": d["citation"],
+                "verse_key": vk,
+                "verse_ref": f"{slug.capitalize()} {ch}:{v}",
+                "fathers": fathers,
+            })
+    return _write_jsonl(rows, os.path.join(out, "father_edges.jsonl"))
+
+
 def copy_graph(out):
     gdir = os.path.join(out, "graph")
     os.makedirs(gdir, exist_ok=True)
@@ -148,6 +193,9 @@ tags:
   - christianity
   - aquinas
   - summa-theologica
+  - church-fathers
+  - catena-aurea
+  - patristics
   - bible
   - vulgate
   - citations
@@ -159,12 +207,16 @@ size_categories:
 configs:
   - config_name: summa
     data_files: summa.jsonl
+  - config_name: catena_aurea
+    data_files: catena_aurea.jsonl
   - config_name: douay_rheims
     data_files: douay_rheims.jsonl
   - config_name: clementine_vulgate
     data_files: clementine_vulgate.jsonl
   - config_name: scripture_edges
     data_files: scripture_edges.jsonl
+  - config_name: father_edges
+    data_files: father_edges.jsonl
   - config_name: internal_edges
     data_files: internal_edges.jsonl
 ---
@@ -184,18 +236,21 @@ Source, ingest code, a live web explorer, and an MCP grounding server:
 | config | rows | what |
 |--------|------|------|
 | `summa` | {n_summa} | The Summa Theologica of Thomas Aquinas, one row per article, with its canonical citation (`ST I, q.2, a.3`) and full verbatim text. |
+| `catena_aurea` | {n_catena} | The Catena Aurea - Aquinas's patristic "golden chain" on the four Gospels, one row per verse-pericope: the verse commented on, the Church Fathers in the chain, and their full verbatim commentary. |
 | `douay_rheims` | {n_drb} | The Douay-Rheims Bible (Challoner revision), one row per verse, English. |
 | `clementine_vulgate` | {n_vg} | The Clementine Vulgate (Sixto-Clementine, 1592), one row per verse, Latin - keyed identically to the Douay-Rheims so a citation resolves to both languages. |
 | `scripture_edges` | {n_se} | The citation graph: one row per (Summa article -> Scripture verse) edge. |
+| `father_edges` | {n_fe} | The patristic golden chain as edges: one row per (Catena Aurea pericope -> Gospel verse it comments on), with the Fathers who speak - which Fathers weigh in on which verse. |
 | `internal_edges` | {n_ie} | The citation graph: one row per (Summa article -> Summa article) edge. |
 
 ```python
 from datasets import load_dataset
 
-summa  = load_dataset("TheAlvaroBalbin/catena", "summa")
-verses = load_dataset("TheAlvaroBalbin/catena", "douay_rheims")
-latin  = load_dataset("TheAlvaroBalbin/catena", "clementine_vulgate")
-edges  = load_dataset("TheAlvaroBalbin/catena", "scripture_edges")
+summa   = load_dataset("TheAlvaroBalbin/catena", "summa")
+fathers = load_dataset("TheAlvaroBalbin/catena", "catena_aurea")
+verses  = load_dataset("TheAlvaroBalbin/catena", "douay_rheims")
+latin   = load_dataset("TheAlvaroBalbin/catena", "clementine_vulgate")
+edges   = load_dataset("TheAlvaroBalbin/catena", "scripture_edges")
 ```
 
 Every verse shares a `verse_key` (`john/1/14`) across the two Bibles and the edge
@@ -218,6 +273,8 @@ Full provenance and the per-text rights reasoning are in
 
 - **Summa Theologica** - trans. Fathers of the English Dominican Province, 2nd rev. ed.
   (1920-22). Public domain.
+- **Catena Aurea** - Aquinas's compilation of the Church Fathers on the Gospels, in the
+  Oxford translation edited by J. H. Newman (1841-45). Public domain.
 - **Douay-Rheims Bible** - Challoner revision (1749-52), via Project Gutenberg #1581.
   Public domain.
 - **Clementine Vulgate** - Sixto-Clementine (1592); electronic edition by The Clementine
@@ -246,20 +303,23 @@ def main():
     os.makedirs(out, exist_ok=True)
 
     n_summa = build_summa(out)
+    n_catena = build_catena(out)
     n_drb = build_bible("drb", "douay_rheims.jsonl", out, latin=False)
     n_vg = build_bible("vg", "clementine_vulgate.jsonl", out, latin=True)
     n_se = build_scripture_edges(out)
+    n_fe = build_father_edges(out)
     n_ie = build_internal_edges(out)
     copy_graph(out)
 
-    card = CARD.format(n_summa=f"{n_summa:,}", n_drb=f"{n_drb:,}", n_vg=f"{n_vg:,}",
-                       n_se=f"{n_se:,}", n_ie=f"{n_ie:,}")
+    card = CARD.format(n_summa=f"{n_summa:,}", n_catena=f"{n_catena:,}", n_drb=f"{n_drb:,}",
+                       n_vg=f"{n_vg:,}", n_se=f"{n_se:,}", n_fe=f"{n_fe:,}", n_ie=f"{n_ie:,}")
     with open(os.path.join(out, "README.md"), "w", encoding="utf-8") as f:
         f.write(card)
 
     print(f"wrote HF bundle to {out}")
-    print(f"  summa: {n_summa}  douay_rheims: {n_drb}  clementine_vulgate: {n_vg}")
-    print(f"  scripture_edges: {n_se}  internal_edges: {n_ie}")
+    print(f"  summa: {n_summa}  catena_aurea: {n_catena}  douay_rheims: {n_drb}  "
+          f"clementine_vulgate: {n_vg}")
+    print(f"  scripture_edges: {n_se}  father_edges: {n_fe}  internal_edges: {n_ie}")
 
 
 if __name__ == "__main__":
