@@ -7,99 +7,115 @@
 <meta name="description" content="Ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the golden chain of Scripture behind them, in English and the Latin Vulgate. It cites its sources or it refuses - it never invents.">
 <style>
   :root{
-    --bg:#f7f8fa; --card:#ffffff; --ink:#1b1d21; --muted:#656b76; --line:#e7e9ef;
-    --accent:#6366f1; --accent-strong:#4f46e5; --accent-soft:#eef0fe;
-    --amber:#b45309; --amber-bg:#fef6ec; --amber-line:#f2dcbf;
-    --sh:0 1px 2px rgba(16,24,40,.05); --sh-h:0 8px 24px rgba(16,24,40,.10);
-    --r:14px;
+    --paper:#fcfbf8; --ink:#1c1917; --muted:#756d61; --rubric:#9c2f26;
+    --rule:#e6e1d5; --rule-strong:#c8c0af;
+    --serif:"Palatino Linotype","Book Antiqua",Palatino,"Iowan Old Style",Georgia,serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Consolas,"Liberation Mono",Menlo,monospace;
+    --measure:720px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink)}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-       line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  html,body{margin:0;background:var(--paper);color:var(--ink)}
+  body{font-family:var(--serif);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
   a{color:inherit;text-decoration:none}
-  .wrap{max-width:900px;margin:0 auto;padding:0 20px}
-  .ui{font-family:inherit}
+  .wrap{max-width:var(--measure);margin:0 auto;padding:0 24px}
+  .ui{font-family:var(--mono)}
 
-  header{padding:44px 0 6px}
-  .brand h1{font-size:42px;margin:0;font-weight:800;letter-spacing:-.025em;
-     background:linear-gradient(95deg,var(--accent-strong),#8b5cf6);
-     -webkit-background-clip:text;background-clip:text;color:transparent}
-  .tag{color:var(--muted);font-size:15.5px;margin:12px 0 0;max-width:600px;line-height:1.55}
-  .stats{margin:18px 0 2px;font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap}
-  .stats span{background:var(--card);border:1px solid var(--line);border-radius:999px;
-     padding:5px 13px;box-shadow:var(--sh);color:var(--muted)}
-  .stats b{color:var(--ink);font-weight:700}
+  /* masthead: title-page wordmark + a short red chain-rule */
+  header{padding:52px 0 4px}
+  .brand h1{font-family:var(--serif);font-size:36px;margin:0;font-weight:600;
+     text-transform:uppercase;letter-spacing:.16em;color:var(--ink)}
+  .brand h1::after{content:"";display:block;width:46px;height:2px;background:var(--rubric);margin-top:16px}
+  .tag{font-size:16.5px;margin:20px 0 0;max-width:34em;line-height:1.5;color:var(--ink)}
+  .stats{margin:22px 0 2px;font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;
+     color:var(--muted);display:flex;flex-wrap:wrap}
+  .stats span{padding:0 14px;border-left:1px solid var(--rule)}
+  .stats span:first-child{padding-left:0;border-left:0}
+  .stats b{color:var(--ink);font-weight:600}
 
-  form.search{position:sticky;top:0;z-index:5;
-       background:linear-gradient(var(--bg) 78%,transparent);padding:16px 0 16px}
-  .searchbar{display:flex;gap:10px}
-  #q{flex:1;font-size:16.5px;padding:15px 20px;border:1px solid var(--line);
-     background:var(--card);color:var(--ink);border-radius:999px;font-family:inherit;outline:none;box-shadow:var(--sh)}
-  #q::placeholder{color:#9aa0ab}
-  #q:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
-  button.go{font-family:inherit;font-size:16px;font-weight:600;padding:0 28px;border:0;
-     background:var(--accent);color:#fff;border-radius:999px;cursor:pointer;box-shadow:var(--sh)}
-  button.go:hover{background:var(--accent-strong)}
-  button.go:disabled{opacity:.45;cursor:default}
-  .hint{color:var(--muted);font-size:12.5px;margin-top:11px;text-align:center}
+  /* the ruled line you write on */
+  form.search{position:sticky;top:0;z-index:5;background:var(--paper);
+       padding:22px 0 18px;border-bottom:1px solid var(--rule)}
+  .searchbar{display:flex;align-items:baseline;gap:14px;
+     border-bottom:2px solid var(--ink);padding-bottom:2px}
+  .searchbar::before{content:"\00B6";color:var(--rubric);font-size:18px;line-height:1}
+  #q{flex:1;font-family:var(--serif);font-size:21px;padding:8px 0;border:0;background:transparent;
+     color:var(--ink);outline:none}
+  #q::placeholder{color:#a99f8f;font-style:italic}
+  .searchbar:focus-within{border-bottom-color:var(--rubric)}
+  button.go{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;
+     text-transform:uppercase;padding:8px 0;border:0;background:transparent;color:var(--rubric);cursor:pointer}
+  button.go:disabled{opacity:.4;cursor:default}
+  .hint{font-family:var(--mono);color:var(--muted);font-size:11px;margin-top:12px;letter-spacing:.01em}
 
-  main{padding:12px 0 90px;min-height:50vh}
-  .section-title{font-size:12px;letter-spacing:.09em;text-transform:uppercase;
-     color:var(--accent-strong);margin:32px 0 13px;font-weight:700}
-  .section-title:first-child{margin-top:4px}
+  main{padding:30px 0 100px;min-height:50vh}
+  /* apparatus label */
+  .section-title{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+     color:var(--rubric);margin:38px 0 16px;font-weight:600}
+  .section-title:first-child{margin-top:2px}
 
-  .row{display:block;padding:16px 18px;border:1px solid var(--line);border-radius:var(--r);
-     background:var(--card);margin-bottom:12px;cursor:pointer;box-shadow:var(--sh);
-     transition:box-shadow .15s,transform .15s,border-color .15s}
-  .row:hover{box-shadow:var(--sh-h);transform:translateY(-1px);border-color:#d9dce4}
-  .cite{font-size:12.5px;color:var(--accent-strong);font-weight:700;letter-spacing:.01em}
-  .row .title{font-size:17px;margin:4px 0 0;font-weight:600}
-  .row .snip{color:var(--muted);font-size:14.5px;margin-top:8px;line-height:1.5}
-  .row .deg{float:right;color:var(--muted);font-size:12px;font-weight:500}
+  /* a glossed entry: citation rubric in the margin, text in the measure */
+  .row{display:grid;grid-template-columns:128px 1fr;column-gap:26px;
+     padding:15px 0;border-top:1px solid var(--rule);cursor:pointer}
+  .row:first-of-type{border-top:0}
+  .cite{grid-column:1;grid-row:1;font-family:var(--mono);font-size:12px;color:var(--rubric);
+     letter-spacing:.01em;padding-top:2px}
+  .row .title{grid-column:2;grid-row:1;font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.35}
+  .row:hover .title{text-decoration:underline;text-decoration-color:var(--rubric);text-underline-offset:3px}
+  .row .snip{grid-column:2;grid-row:2;color:var(--muted);font-size:15px;margin-top:7px;line-height:1.5}
+  .row .deg{grid-column:1;grid-row:2;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:7px}
 
-  .chips{display:flex;flex-wrap:wrap;gap:9px}
-  .chip{font-size:13.5px;padding:8px 14px;border-radius:999px;border:1px solid transparent;
-     background:var(--accent-soft);cursor:pointer;color:var(--accent-strong);font-weight:500;transition:background .12s}
-  .chip:hover{background:#e2e5fd}
-  .chip .ct{color:var(--muted);margin-left:7px;font-size:12px;font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:8px 10px}
+  .chip{font-family:var(--mono);font-size:12px;padding:6px 11px;border:1px solid var(--rule-strong);
+     cursor:pointer;color:var(--ink);letter-spacing:.01em;background:transparent}
+  .chip:hover{border-color:var(--rubric);color:var(--rubric)}
+  .chip .ct{color:var(--rubric);margin-left:8px;font-size:10.5px}
 
-  .article{max-width:720px}
-  .article h2{font-size:26px;margin:4px 0 2px;font-weight:700;line-height:1.28;letter-spacing:-.01em}
-  .article .body{font-family:Georgia,"Times New Roman",serif;font-size:18.5px;line-height:1.72;
-     white-space:pre-wrap;margin-top:16px}
-  .back{color:var(--muted);font-size:14px;cursor:pointer;display:inline-flex;gap:6px;
-     align-items:center;margin-bottom:10px;font-weight:500}
-  .back:hover{color:var(--accent-strong)}
+  .article{max-width:38em}
+  .article .cite{display:block;margin-bottom:8px}
+  .article h2{font-family:var(--serif);font-size:27px;margin:0;font-weight:600;line-height:1.28}
+  .article .body{font-family:var(--serif);font-size:19px;line-height:1.72;white-space:pre-wrap;margin-top:20px}
+  .back{font-family:var(--mono);color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+     cursor:pointer;display:inline-block;margin-bottom:16px}
+  .back:hover{color:var(--rubric)}
 
-  .chain{margin:30px 0 0;border-top:1px solid var(--line);padding-top:6px}
-  .chain h3{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent-strong);
-     margin:22px 0 10px;font-weight:700}
-  .link{display:inline-block;padding:7px 12px;margin:0 8px 8px 0;border:1px solid var(--line);
-     border-radius:10px;cursor:pointer;font-size:14px;background:var(--card);box-shadow:var(--sh);
-     transition:box-shadow .12s,transform .12s}
-  .link:hover{box-shadow:var(--sh-h);transform:translateY(-1px)}
-  .link .lc{color:var(--accent-strong);font-size:12px;font-weight:700}
+  /* the critical apparatus */
+  .chain{margin:40px 0 0;border-top:2px solid var(--ink);padding-top:4px}
+  .chain h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+     color:var(--rubric);margin:24px 0 11px;font-weight:600}
+  .link{display:inline-block;margin:0 18px 9px 0;cursor:pointer;font-family:var(--serif);font-size:15.5px;
+     color:var(--ink);border-bottom:1px solid var(--rule)}
+  .link:hover{border-bottom-color:var(--rubric)}
+  .link .lc{font-family:var(--mono);color:var(--rubric);font-size:12px;margin-right:2px}
 
-  .verse{border-left:3px solid var(--accent);background:var(--card);border-radius:0 12px 12px 0;
-     padding:14px 18px;margin:16px 0;box-shadow:var(--sh)}
-  .verse .en{font-size:18px;line-height:1.6}
-  .verse .la{font-size:16px;font-style:italic;color:var(--muted);margin-top:9px;font-family:Georgia,serif}
-  .verse .la .vg{font-style:normal;font-family:inherit;font-size:10px;letter-spacing:.08em;font-weight:700;
-     text-transform:uppercase;color:var(--accent);margin-right:9px;vertical-align:1px}
-  .vref{font-size:12.5px;color:var(--accent-strong);font-weight:700;margin-bottom:6px}
+  /* parallel-text edition */
+  .verse{border-left:2px solid var(--rubric);padding:2px 0 2px 20px;margin:18px 0}
+  .verse .en{font-family:var(--serif);font-size:18.5px;line-height:1.6}
+  .verse .la{font-family:var(--serif);font-size:16.5px;font-style:italic;color:var(--muted);margin-top:8px}
+  .verse .la .vg{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+     text-transform:uppercase;color:var(--rubric);margin-right:10px;vertical-align:1px}
+  .vref{font-family:var(--mono);font-size:12px;color:var(--rubric);margin-bottom:7px;letter-spacing:.01em}
 
-  .refuse{border:1px solid var(--amber-line);border-radius:var(--r);padding:20px;
-     color:var(--amber);background:var(--amber-bg);box-shadow:var(--sh)}
-  .refuse b{display:block;margin-bottom:6px;font-size:16px;color:#92400e}
-  .note{color:var(--muted);font-size:14px;margin:12px 0}
-  .loading{color:var(--muted);font-size:14px}
-  footer{border-top:1px solid var(--line);padding:26px 0 48px;color:var(--muted);font-size:13px;line-height:1.6}
-  footer a{color:var(--accent-strong);font-weight:600}
-  footer a:hover{text-decoration:underline}
-  .spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);
-     border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:8px}
+  /* an editorial note, not an alert */
+  .refuse{border-left:2px solid var(--rubric);padding:4px 0 4px 20px;color:var(--ink);font-size:17px;line-height:1.55}
+  .refuse b{display:block;margin-bottom:5px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+     text-transform:uppercase;color:var(--rubric);font-weight:600}
+  .note{color:var(--muted);font-size:15px;margin:14px 0;line-height:1.5}
+  .loading{font-family:var(--mono);color:var(--muted);font-size:12px;letter-spacing:.02em}
+  footer{border-top:1px solid var(--rule);margin-top:30px;padding:24px 0 52px;color:var(--muted);
+     font-family:var(--mono);font-size:11.5px;line-height:1.7;letter-spacing:.01em}
+  footer a{color:var(--rubric);border-bottom:1px solid transparent}
+  footer a:hover{border-bottom-color:var(--rubric)}
+  .spin{display:inline-block;width:10px;height:10px;border:1.5px solid var(--rule-strong);
+     border-top-color:var(--rubric);border-radius:50%;animation:sp .8s linear infinite;vertical-align:0;margin-right:8px}
   @keyframes sp{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.spin{animation:none}}
+
+  @media (max-width:600px){
+    .row{grid-template-columns:1fr;row-gap:4px}
+    .cite,.row .title,.row .snip,.row .deg{grid-column:1}
+    .cite{grid-row:auto} .row .title{grid-row:auto} .row .snip{grid-row:auto} .row .deg{grid-row:auto;margin-top:2px}
+    .brand h1{font-size:29px;letter-spacing:.12em}
+  }
 </style>
 </head>
 <body>
