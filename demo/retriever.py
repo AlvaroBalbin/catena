@@ -51,15 +51,20 @@ class Doc:
 
 
 class Index:
-    # A query term anchors retrieval only if it is discriminative: present, and not
-    # so common it carries no signal. This is what makes refusal work - a padded
-    # query ("how do I ...") is not rescued by common words matching everything.
-    DISCRIMINATIVE_MAX_DF = 0.12
-    # Above this a term is too common to be what a query is "about".
-    SALIENT_MAX_DF = 0.40
-    # At least half of a query's salient terms must actually exist in the corpus,
-    # or the query is about things we do not have -> refuse.
-    MIN_COVERAGE = 0.5
+    # Refusal and ranking are two DIFFERENT jobs, kept separate on purpose.
+    #
+    # RANKING scores on every salient (non-stopword, in-corpus) query term with BM25.
+    # BM25's IDF already downweights a term the more common it is, so a central word
+    # like "faith" or "God" contributes without drowning out a rarer one - and, unlike
+    # a hard rare-terms-only filter, a question about the corpus's core themes is no
+    # longer answered by its one incidental word.
+    #
+    # REFUSAL is a separate gate: a query is out of domain unless enough of its content
+    # words actually exist in the corpus. A padded junk query ("how to change a car
+    # tire") shares a common word or two but most of its content is absent, so it
+    # refuses; "is God good", whose every content word IS in the corpus, does not.
+    MIN_COVERAGE = 0.8    # >= this share of content terms must exist in the corpus
+    MIN_SCORE = 0.5       # a top hit must clear this BM25 floor, else refuse
 
     def __init__(self) -> None:
         self.docs: list[Doc] = []
@@ -82,23 +87,24 @@ class Index:
     def finalize(self) -> None:
         self.avgdl = (sum(self.len) / len(self.len)) if self.len else 0.0
 
-    def _discriminative(self, query: str) -> list[str]:
-        N = max(1, len(self.docs))
-        return [t for t in dict.fromkeys(tokenize(query))
-                if 0 < self.df.get(t, 0) <= self.DISCRIMINATIVE_MAX_DF * N]
+    def _content_terms(self, query: str) -> list[str]:
+        """The query's salient (non-stopword) terms, deduped in order."""
+        return list(dict.fromkeys(tokenize(query)))
 
     def _coverage(self, query: str) -> float:
-        N = max(1, len(self.docs))
-        salient = [t for t in dict.fromkeys(tokenize(query))
-                   if self.df.get(t, 0) <= self.SALIENT_MAX_DF * N]
-        if not salient:
+        """Fraction of the query's content terms that exist anywhere in the corpus.
+        Low coverage = the query is about things we do not have -> refuse."""
+        terms = self._content_terms(query)
+        if not terms:
             return 0.0
-        return sum(1 for t in salient if self.df.get(t, 0) > 0) / len(salient)
+        return sum(1 for t in terms if self.df.get(t, 0) > 0) / len(terms)
 
     def search(self, query: str, k: int = 5, k1: float = 1.5, b: float = 0.75):
-        terms = self._discriminative(query)
-        # refuse: nothing to anchor on, or the query is mostly out-of-vocabulary
-        if not terms or self._coverage(query) < self.MIN_COVERAGE:
+        # refuse out of domain: too little of the query's content is in the corpus
+        if self._coverage(query) < self.MIN_COVERAGE:
+            return []
+        terms = [t for t in self._content_terms(query) if self.df.get(t, 0) > 0]
+        if not terms:
             return []
         N = len(self.docs)
         scores = [0.0] * N
@@ -112,6 +118,10 @@ class Index:
                 denom = f + k1 * (1 - b + b * self.len[i] / self.avgdl)
                 scores[i] += idf * (f * (k1 + 1)) / denom
         ranked = sorted(range(N), key=lambda i: scores[i], reverse=True)
+        # a coincidental brush with a common word scores near zero; require a real
+        # match so the refusal stays meaningful even when coverage squeaks by.
+        if not ranked or scores[ranked[0]] < self.MIN_SCORE:
+            return []
         return [(self.docs[i], scores[i]) for i in ranked[:k] if scores[i] > 0]
 
 

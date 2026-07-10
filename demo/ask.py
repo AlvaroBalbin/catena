@@ -29,13 +29,10 @@ import urllib.request
 
 from retriever import load_index, tokenize
 
-# BM25 confidence floor below which we refuse rather than pretend.
-FLOOR = 3.0
-
 
 def refuse(query: str) -> None:
     print(f'\nThe corpus does not contain a clear answer to: "{query}"')
-    print("(No passage scored above the relevance floor. Catena refuses rather "
+    print("(The query's subject is not in the corpus, so Catena refuses rather "
           "than guess - that refusal is the point.)\n")
 
 
@@ -128,8 +125,9 @@ def main() -> None:
     idx = load_index()
     hits = idx.search(query, k=args.k)
 
-    # honest refusal: nothing relevant, or nothing above the floor
-    if not hits or hits[0][1] < FLOOR:
+    # honest refusal: the retriever returns nothing when the query is out of domain
+    # (its subject is not in the corpus) - it owns the relevance floor, so we trust it.
+    if not hits:
         refuse(query)
         return
 

@@ -23,15 +23,18 @@ def main() -> None:
     assert top.citation.startswith("ST "), top.citation
     assert top.text.strip(), "retrieved passage must have verbatim text"
 
-    # out of domain: must refuse (no hits)
+    # a question built from the corpus's CENTRAL vocabulary must still ground: the
+    # ranking must not filter out common-but-meaningful terms (the regression that
+    # made "is God good" wrongly refuse). Full quality set: test_retrieval_quality.py.
+    assert idx.search("is God good"), "expected a match for a central-theme question"
+
+    # out of domain: must refuse (no hits) - the query's subject is not in the corpus
     assert not idx.search("how do I configure a kubernetes ingress controller"), \
         "expected refusal for an out-of-domain question"
+    assert not idx.search("best recipe for chocolate chip cookies"), \
+        "expected refusal for an out-of-domain question"
 
-    # vacuous (only common words): must refuse
-    assert not idx.search("how do I do good things"), \
-        "expected refusal for a vacuous query"
-
-    print("OK: grounds in-corpus, refuses out-of-domain and vacuous queries")
+    print("OK: grounds in-corpus and central-theme questions, refuses out-of-domain")
 
 
 if __name__ == "__main__":
