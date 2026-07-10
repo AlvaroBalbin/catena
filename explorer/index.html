@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catena - ask the Catholic tradition, cited or refused</title>
+<meta name="description" content="Ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the golden chain of Scripture behind them, in English and the Latin Vulgate. It cites its sources or it refuses - it never invents.">
+<style>
+  :root{
+    --paper:#f6f2e9; --ink:#262019; --muted:#6d6455; --line:#e0d8c6;
+    --gold:#9a7b1f; --gold-soft:#b89a4e; --card:#fbf8f1; --accent-bg:#efe8d6;
+    --refuse:#8a5a2b;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#16140f; --ink:#eae4d6; --muted:#9c927e; --line:#2c281f;
+      --gold:#d9b45f; --gold-soft:#b9974a; --card:#1e1b14; --accent-bg:#241f16;
+      --refuse:#d3a05e;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink)}
+  body{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+       line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  .ui{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+
+  header{padding:34px 0 10px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .brand h1{font-size:34px;margin:0;letter-spacing:.5px;font-weight:600}
+  .brand .chain{color:var(--gold);font-size:22px;letter-spacing:2px}
+  .tag{color:var(--muted);font-size:15px;margin:8px 0 0}
+  .stats{margin:14px 0 2px;color:var(--muted);font-size:13px;display:flex;gap:6px 18px;flex-wrap:wrap}
+  .stats b{color:var(--ink);font-weight:600}
+
+  form.search{position:sticky;top:0;z-index:5;background:var(--paper);
+       padding:18px 0 16px;border-bottom:1px solid var(--line)}
+  .searchbar{display:flex;gap:8px}
+  #q{flex:1;font-size:18px;padding:13px 15px;border:1px solid var(--line);
+     background:var(--card);color:var(--ink);border-radius:10px;font-family:inherit;outline:none}
+  #q:focus{border-color:var(--gold-soft);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 18%,transparent)}
+  button.go{font-family:inherit;font-size:17px;padding:0 20px;border:1px solid var(--gold);
+     background:var(--gold);color:#1a1508;border-radius:10px;cursor:pointer}
+  button.go:disabled{opacity:.5;cursor:default}
+  .hint{color:var(--muted);font-size:12.5px;margin-top:8px}
+
+  main{padding:26px 0 80px;min-height:50vh}
+  .section-title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+     color:var(--gold);margin:30px 0 12px;font-family:-apple-system,system-ui,sans-serif;font-weight:600}
+  .section-title:first-child{margin-top:6px}
+
+  .row{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+     background:var(--card);margin-bottom:10px;cursor:pointer;transition:border-color .12s,transform .12s}
+  .row:hover{border-color:var(--gold-soft)}
+  .cite{font-family:-apple-system,system-ui,sans-serif;font-size:12.5px;color:var(--gold);
+     font-weight:600;letter-spacing:.02em}
+  .row .title{font-size:17px;margin:3px 0 0}
+  .row .snip{color:var(--muted);font-size:14.5px;margin-top:6px}
+  .row .deg{float:right;color:var(--muted);font-size:12px;font-family:system-ui,sans-serif}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:-apple-system,system-ui,sans-serif;font-size:13.5px;padding:7px 12px;border-radius:999px;
+     border:1px solid var(--line);background:var(--accent-bg);cursor:pointer;color:var(--ink)}
+  .chip:hover{border-color:var(--gold-soft)}
+  .chip .ct{color:var(--muted);margin-left:6px;font-size:12px}
+
+  .article{max-width:760px}
+  .article h2{font-size:25px;margin:2px 0 4px;font-weight:600;line-height:1.3}
+  .article .body{font-size:18px;white-space:pre-wrap;margin-top:14px}
+  .back{color:var(--muted);font-size:13.5px;cursor:pointer;font-family:system-ui,sans-serif;
+     display:inline-flex;gap:6px;align-items:center;margin-bottom:6px}
+  .back:hover{color:var(--gold)}
+
+  .chain{margin:26px 0 0;border-top:1px solid var(--line);padding-top:8px}
+  .chain h3{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);
+     font-family:system-ui,sans-serif;margin:18px 0 8px;font-weight:600}
+  .link{display:inline-block;padding:5px 10px;margin:0 6px 6px 0;border:1px solid var(--line);
+     border-radius:8px;cursor:pointer;font-size:14px;background:var(--card)}
+  .link:hover{border-color:var(--gold-soft)}
+  .link .lc{color:var(--gold);font-family:system-ui,sans-serif;font-size:12px;font-weight:600}
+
+  .verse{border-left:3px solid var(--gold);padding:4px 0 4px 16px;margin:14px 0}
+  .verse .en{font-size:18px}
+  .verse .la{font-size:16px;font-style:italic;color:var(--muted);margin-top:7px}
+  .verse .la .vg{font-style:normal;font-family:system-ui,sans-serif;font-size:10.5px;letter-spacing:.1em;
+     text-transform:uppercase;color:var(--gold-soft);margin-right:8px;vertical-align:1px}
+  .vref{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--gold);font-weight:600}
+
+  .refuse{border:1px dashed var(--refuse);border-radius:10px;padding:18px 18px;color:var(--refuse);
+     background:color-mix(in srgb,var(--refuse) 7%,transparent)}
+  .refuse b{display:block;margin-bottom:5px;font-size:16px}
+  .note{color:var(--muted);font-size:14px;margin:10px 0}
+  .loading{color:var(--muted);font-size:14px;font-family:system-ui,sans-serif}
+  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:13px}
+  footer a{color:var(--gold);border-bottom:1px solid transparent}
+  footer a:hover{border-color:var(--gold-soft)}
+  .spin{display:inline-block;width:11px;height:11px;border:2px solid var(--line);
+     border-top-color:var(--gold);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-1px;margin-right:7px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <h1>Catena</h1><span class="chain">&#9741; &#9741; &#9741;</span>
+    </div>
+    <p class="tag">Ask the Catholic tradition. Read the actual passages Aquinas wrote,
+       verbatim and cited, and walk the chain of Scripture behind them - in English and
+       the Latin Vulgate. It cites its sources, or it refuses. It never invents.</p>
+    <div class="stats ui" id="stats"></div>
+  </div>
+</header>
+
+<form class="search" id="form" autocomplete="off">
+  <div class="wrap">
+    <div class="searchbar">
+      <input id="q" placeholder="Loading the corpus..." disabled
+             aria-label="Ask a question or enter a citation">
+      <button class="go ui" id="go" type="submit" disabled>Ask</button>
+    </div>
+    <div class="hint ui">Try a question ("is God good"), a Scripture reference
+       ("John 1:14", "Romans 5"), or a citation ("ST I, q.2, a.3").</div>
+  </div>
+</form>
+
+<main><div class="wrap" id="view"></div></main>
+
+<footer><div class="wrap ui">
+  Catena is an open, public-domain corpus: the Summa Theologica, the Douay-Rheims Bible,
+  and the Clementine Vulgate, with a citation graph and a cite-or-refuse retrieval demo.
+  This page runs entirely in your browser over that open data - nothing you type leaves it.
+  &nbsp;<a href="https://github.com/AlvaroBalbin/catena" target="_blank" rel="noopener">Source &amp; data on GitHub &#8599;</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const view = $("#view"), qEl = $("#q"), goEl = $("#go");
+const esc = s => (s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let CORE=null, BODIES=null, INDEX=null;
+
+// ---- BM25, a faithful port of demo/retriever.py (same stopwords + thresholds) ----
+const STOP = new Set(("the a an and or but of to in on for with as is are was were be been being "+
+ "that this these those it its he she they them his her their we you i not by from at into than then "+
+ "so if which who whom whose what when where how do does did done have has had may can could shall will "+
+ "would should must more most other any some such no nor thing things said unto thee thou thy hath doth "+
+ "also upon whether").split(" "));
+const tokenize = t => (t.toLowerCase().match(/[a-z0-9]+/g)||[]).filter(w => w.length>1 && !STOP.has(w));
+const MIN_COVERAGE=0.8, MIN_SCORE=0.5, K1=1.5, B=0.75;
+
+function buildIndex(){
+  const docs = CORE.articles;                 // [[id,cit,title],...]
+  const tf=[], len=[], df=Object.create(null);
+  for(const [id,cit,title] of docs){
+    const toks = tokenize(title+" "+(BODIES[id]||""));
+    const m=Object.create(null);
+    for(const t of toks) m[t]=(m[t]||0)+1;
+    for(const t in m) df[t]=(df[t]||0)+1;
+    tf.push(m); len.push(toks.length);
+  }
+  const avgdl = len.reduce((a,b)=>a+b,0)/(len.length||1);
+  INDEX = {docs,tf,len,df,avgdl,N:docs.length};
+}
+function search(query,k=8){
+  const I=INDEX, terms0=[...new Set(tokenize(query))];
+  if(!terms0.length) return [];
+  const cov = terms0.filter(t=>I.df[t]>0).length/terms0.length;
+  if(cov < MIN_COVERAGE) return [];
+  const terms = terms0.filter(t=>I.df[t]>0);
+  if(!terms.length) return [];
+  const scores = new Float64Array(I.N);
+  for(const term of terms){
+    const df=I.df[term], idf=Math.log(1+(I.N-df+0.5)/(df+0.5));
+    for(let i=0;i<I.N;i++){
+      const f=I.tf[i][term]; if(!f) continue;
+      scores[i]+= idf*(f*(K1+1))/(f+K1*(1-B+B*I.len[i]/I.avgdl));
+    }
+  }
+  const order=[...scores.keys()].sort((a,b)=>scores[b]-scores[a]);
+  if(!order.length || scores[order[0]]<MIN_SCORE) return [];
+  return order.slice(0,k).filter(i=>scores[i]>0).map(i=>({doc:I.docs[i],score:scores[i]}));
+}
+
+// ---- lookups over core ----
+let META=null;      // id -> [cit,title]
+function meta(){ if(!META){ META=Object.create(null); for(const [id,c,t] of CORE.articles) META[id]=[c,t]; } return META; }
+const snippet = (txt,n=340) => { txt=(txt||"").replace(/\s+/g," ").trim();
+  return txt.length>n ? txt.slice(0,n).replace(/\s+\S*$/,"")+" ..." : txt; };
+
+function parseCitation(s){
+  const m = s.match(/^\s*(?:st\s+)?(i-ii|ii-ii|iii|suppl|i)\b[\s.,]*q\.?\s*(\d+)[\s.,]*a\.?\s*(\d+)/i);
+  if(!m) return null;
+  const id = `summa.st.${m[1].toLowerCase()}.q${+m[2]}.a${+m[3]}`;
+  return meta()[id] ? id : null;
+}
+function parseRef(s){
+  const m = s.match(/^\s*([1-4]?\s*[a-z][a-z.'\s]*?)\s+(\d+)(?:\s*:\s*(\d+))?\s*$/i);
+  if(!m) return null;
+  const slug = CORE.book_slugs[m[1].toLowerCase().replace(/[\s.]/g,"")];
+  if(!slug) return null;
+  const ch=+m[2], v=m[3]?+m[3]:null;
+  return {slug, ch, v, key: v!=null ? `${slug}/${ch}/${v}` : `${slug}/${ch}`,
+          name: CORE.slug_names[slug]||slug};
+}
+
+// ---- rendering ----
+function go(hash){ location.hash = hash; }
+function articleRow(id,extra=""){ const [c,t]=meta()[id]||["",id];
+  return `<a class="row" href="#/a/${encodeURIComponent(id)}">${extra}
+    <div class="cite">${esc(c)}</div><div class="title">${esc(t)}</div></a>`; }
+
+function renderLanding(){
+  const s=CORE.stats, m=CORE.meta;
+  const arts=(s.most_cited_articles||[]).slice(0,8).map(a=>
+    articleRow(a.id||"", `<span class="deg">${a.in_degree} citations in</span>`)).join("");
+  const verses=(s.most_cited_verses||[]).slice(0,12).map(v=>
+    `<span class="chip" data-go="#/v/${v.key}">${esc(titleRef(v.ref))}<span class="ct">${v.count}</span></span>`).join("");
+  const books=(s.most_cited_books||[]).slice(0,10).map(b=>
+    `<span class="chip">${esc(b[0])}<span class="ct">${b[1]}</span></span>`).join("");
+  const examples=["is God good","does man have free will","is it lawful to kill in self-defense",
+    "John 1:14","whether happiness consists in wealth","ST I, q.2, a.3","Romans 5"]
+    .map(e=>`<span class="chip" data-ask="${esc(e)}">${esc(e)}</span>`).join("");
+  view.innerHTML = `
+    <div class="section-title">Try asking</div><div class="chips">${examples}</div>
+    <div class="section-title">The load-bearing arguments of the Summa</div>
+    <div class="note">By how many other articles cite them - the structural backbone, made visible.</div>
+    ${arts}
+    <div class="section-title">Most-cited Scripture</div><div class="chips">${verses}</div>
+    <div class="section-title">Most-cited books</div><div class="chips">${books}</div>`;
+  scrollTo(0,0);
+}
+const titleRef = r => (r||"").replace(/\b\w/g,c=>c.toUpperCase());
+
+function renderSearch(query){
+  const hits = search(query, 8);
+  if(!hits.length){
+    view.innerHTML = `<div class="refuse"><b>Not in the corpus.</b>
+      Catena has no passage that answers &ldquo;${esc(query)}&rdquo;, so it refuses rather than
+      invent one. That refusal is the point: it only ever returns real, cited source.</div>
+      <div class="note">If this is a genuine theological question, the keyword search may simply
+      have missed it (a known limit of lexical matching). Try rephrasing with its key terms.</div>`;
+    return scrollTo(0,0);
+  }
+  view.innerHTML = `<div class="section-title">${hits.length} grounded passage(s), verbatim and cited</div>` +
+    hits.map(h=>{ const [c,t]=meta()[h.doc[0]];
+      return `<a class="row" href="#/a/${encodeURIComponent(h.doc[0])}">
+        <div class="cite">${esc(c)}</div><div class="title">${esc(t)}</div>
+        <div class="snip">${esc(snippet(BODIES[h.doc[0]]))}</div></a>`; }).join("");
+  scrollTo(0,0);
+}
+
+function verseBlock(key){
+  const vt = CORE.verses[key]; if(!vt) return "";
+  const [en,la]=vt, [slug,ch,v]=key.split("/");
+  const ref = `${CORE.slug_names[slug]||slug} ${ch}:${v}`;
+  return `<div class="verse"><div class="vref">${esc(ref)}</div>
+    <div class="en">${esc(en)||"<span class='note'>(verse text not in corpus)</span>"}</div>
+    ${la?`<div class="la"><span class="vg">Vulgata</span>${esc(la)}</div>`:""}</div>`;
+}
+
+function renderArticle(id){
+  const mt=meta()[id]; if(!mt){ view.innerHTML=`<div class="note">Unknown citation.</div>`; return; }
+  const [cit,title]=mt;
+  if(!BODIES){ view.innerHTML=`<div class="loading"><span class="spin"></span>loading the text...</div>`; return; }
+  const body=BODIES[id]||"";
+  const refs=(CORE.article_refs[id]||[]);
+  const cites=(CORE.internal_refs[id]||[]);
+  const citedBy=(CORE.internal_cited_by[id]||[]);
+  const refsHtml = refs.length ? refs.map(r=>{
+      const k=refToKey(r);
+      return k ? `<span class="link" data-go="#/v/${k}"><span class="lc">verse</span> ${esc(r)}</span>`
+               : `<span class="link">${esc(r)}</span>`;}).join("") : "<span class='note'>none recorded</span>";
+  const citesHtml = cites.length ? cites.map(a=>
+      `<span class="link" data-go="#/a/${encodeURIComponent(a.id)}"><span class="lc">${esc(a.citation)}</span></span>`).join("")
+      : "<span class='note'>none recorded</span>";
+  const byHtml = citedBy.length ? citedBy.slice(0,40).map(a=>
+      `<span class="link" data-go="#/a/${encodeURIComponent(a.id)}"><span class="lc">${esc(a.citation)}</span> ${esc(a.title||"")}</span>`).join("")
+      : "<span class='note'>none recorded</span>";
+  view.innerHTML = `<div class="article">
+    <div class="back" data-back>&#8592; back</div>
+    <div class="cite">${esc(cit)}</div>
+    <h2>${esc(title)}</h2>
+    <div class="body">${esc(body)}</div>
+    <div class="chain">
+      <h3>Rests on this Scripture</h3>${refsHtml}
+      <h3>Cites these articles</h3>${citesHtml}
+      <h3>Is cited by${citedBy.length>40?" (first 40)":""}</h3>${byHtml}
+    </div></div>`;
+  scrollTo(0,0);
+}
+// resolve an article_refs string ("1 Corinthians 15:22", "Romans 5") to a verse/chapter key we hold
+function refToKey(r){
+  const p = parseRef(r); if(!p) return null;
+  return (CORE.verses[p.key] || CORE.scripture_index[p.key]) ? p.key : null;
+}
+
+function renderVerse(key){
+  const arts = CORE.scripture_index[key] || [];
+  const parts = key.split("/"); const isChapter = parts.length===2;
+  let head;
+  if(isChapter){
+    const [slug,ch]=parts;
+    head = `<div class="section-title">${esc((CORE.slug_names[slug]||slug)+" "+ch)}</div>`;
+    // show the cited verses we have text for, in order
+    const vkeys=Object.keys(CORE.verses).filter(k=>k.startsWith(key+"/"))
+      .sort((a,b)=>(+a.split("/")[2])-(+b.split("/")[2]));
+    head += vkeys.map(verseBlock).join("") || "<div class='note'>No verse from this chapter is cited by the Summa.</div>";
+  } else {
+    head = verseBlock(key) || `<div class="note">This verse is not among those the Summa cites, so its text is not in this bundle.</div>`;
+  }
+  const artHtml = arts.length
+    ? `<div class="section-title">${arts.length} article(s) lean on this ${isChapter?"chapter":"verse"}</div>`+
+      arts.map(a=>articleRow(a.id)).join("")
+    : `<div class="note">No Summa article cites this ${isChapter?"chapter":"verse"}.</div>`;
+  view.innerHTML = `<div class="back" data-back>&#8592; back</div>`+head+artHtml;
+  scrollTo(0,0);
+}
+
+// ---- input + routing ----
+function ask(text){ qEl.value=text; submit(); }
+window.ask=ask; window.go=go;
+function submit(){
+  const s=qEl.value.trim(); if(!s) return;
+  const cit=parseCitation(s); if(cit) return go("#/a/"+encodeURIComponent(cit));
+  const ref=parseRef(s);
+  if(ref && (CORE.verses[ref.key] || CORE.scripture_index[ref.key])) return go("#/v/"+ref.key);
+  go("#/s/"+encodeURIComponent(s));
+}
+$("#form").addEventListener("submit",e=>{e.preventDefault();submit();});
+// one delegated handler for every dynamic click target (avoids inline-onclick quoting bugs)
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-ask]"); if(a){ ask(a.getAttribute("data-ask")); return; }
+  const g=e.target.closest("[data-go]"); if(g){ go(g.getAttribute("data-go")); return; }
+  if(e.target.closest("[data-back]")){ history.length>1?history.back():go("#/"); }
+});
+
+function route(){
+  if(!CORE) return;
+  const h=location.hash.replace(/^#\/?/,"");
+  if(h.startsWith("a/"))      return renderArticle(decodeURIComponent(h.slice(2)));
+  if(h.startsWith("v/"))      return renderVerse(h.slice(2));
+  if(h.startsWith("s/")){ const q=decodeURIComponent(h.slice(2)); qEl.value=q;
+     return INDEX ? renderSearch(q) : (view.innerHTML=`<div class="loading"><span class="spin"></span>indexing the Summa...</div>`); }
+  renderLanding();
+}
+window.addEventListener("hashchange",route);
+
+// ---- boot ----
+function fmt(n){ return n.toLocaleString("en-US"); }
+async function boot(){
+  try{
+    CORE = await (await fetch("data/core.json")).json();
+  }catch(e){ view.innerHTML=`<div class="refuse"><b>Could not load the corpus.</b>
+     Serve this folder over http (e.g. <code>python -m http.server</code>) or view it on GitHub Pages;
+     opening the file directly blocks the data fetch.</div>`; return; }
+  const m=CORE.meta;
+  $("#stats").innerHTML =
+    `<span><b>${fmt(m.articles)}</b> Summa articles</span>
+     <span><b>${fmt(m.scripture_edges)}</b> Scripture links</span>
+     <span><b>${fmt(m.internal_edges)}</b> cross-references</span>
+     <span><b>${fmt(m.verses_en)}</b> verses &middot; Douay-Rheims + Vulgate</span>`;
+  route();                                   // landing + verse/citation work from core
+  qEl.disabled=false; goEl.disabled=false; qEl.placeholder="Ask a question, a reference, or a citation...";
+  qEl.focus();
+  // load bodies -> enable full-text search + reading, then re-render the current view
+  // (an article opened via a deep link showed a spinner until its text arrived)
+  try{
+    BODIES = await (await fetch("data/bodies.json")).json();
+    buildIndex();
+    route();
+  }catch(e){ /* graph + verses still work; search will say it is unavailable */ }
+}
+boot();
+</script>
+</body>
+</html>

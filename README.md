@@ -8,6 +8,10 @@ Catena is a clean, machine-readable corpus of public-domain Catholic texts where
 
 The name is from the *Catena Aurea*, Aquinas's "golden chain" of sourced quotations from the Church Fathers. The point then was the same as now: never assert without a source in the chain.
 
+## Try it live (no install)
+
+**[Open the explorer &#8594;](https://alvarobalbin.github.io/catena/explorer/)** - ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the chain of Scripture behind them, in English and the Latin Vulgate; watch it refuse when the corpus does not contain the answer. It runs entirely in your browser over the open data in this repo - no server, no key, nothing you type leaves the page.
+
 ## What this is (and is not)
 
 - **It is a dataset + a reference retrieval demo.** The dataset is the deliverable. The demo exists to prove the discipline (grounded, cited, refuses to hallucinate), not to be a product.
@@ -43,21 +47,31 @@ catena/
     graph/            # the citation graph (verse -> articles, article -> refs, stats)
   ingest/             # ingest scripts, reference normalizer, graph builder, validator
   demo/               # grounded cite-or-refuse retrieval + graph-walking tools
+  explorer/           # the zero-install web explorer (one static page over the data)
   mcp/                # MCP server: ground any AI in the corpus
-  tests/              # grounding, graph, and MCP smoke tests
+  tests/              # grounding, graph, retrieval-quality, and MCP smoke tests
   LICENSE             # MIT (covers the CODE only; text licenses are per-source)
 ```
 
-## Try it
+## Run it locally
 
-No install, no keys:
+The built corpus is committed, so the demos work straight from a clone - no keys, no
+ingest step:
+
+```bash
+python demo/ask.py "is sacred doctrine a science"   # grounded, cited answer or a refusal
+python demo/refs.py "John 1:14"                      # walk the golden chain from a verse
+python -m http.server -d explorer 8000              # then open localhost:8000 for the explorer
+```
+
+To rebuild the corpus from source instead of using the committed data:
 
 ```bash
 python ingest/run.py --all      # build the Summa from source (one-time, ~10 min, polite)
 python ingest/bible.py          # add the Douay-Rheims Bible (35,786 verses, one fetch)
 python ingest/vulgate.py        # add the Clementine Vulgate Latin, in parallel (35,809 verses)
 python ingest/validate.py       # prove it: lossless, addressable, complete
-python demo/ask.py "is sacred doctrine a science"
+python explorer/build.py        # rebuild the explorer's data bundle
 ```
 
 ```
