@@ -16,6 +16,7 @@ import sys
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, os.path.join(ROOT, "demo"))
 from retriever import load_index  # noqa: E402
+import semantic  # noqa: E402
 
 # query -> the set of citations any of which counts as a correct top-5 hit. Where a
 # question legitimately maps to a small cluster (God's existence, God's goodness), all
@@ -101,15 +102,36 @@ def evaluate(idx, k=5, verbose=True):
     return rate, refused, core_misses, leaked
 
 
+def evaluate_semantic():
+    """Opt-in: only runs when the embeddings and an OPENAI_API_KEY are both present
+    (it embeds each query live). Semantic search should close the lexical ceiling -
+    every answerable query hits, nothing out-of-domain leaks."""
+    print("\n-- semantic (embeddings) --")
+    idx = semantic.load_semantic()
+    rate, refused, _core, leaked = evaluate(idx)
+    ok = rate >= 0.95 and refused == len(OUT_OF_DOMAIN)
+    print("OK: semantic closes the lexical ceiling"
+          if ok else "FAIL: semantic below bar")
+    return ok
+
+
 def main():
+    print("-- lexical (BM25) --")
     idx = load_index()
     rate, refused, core_misses, leaked = evaluate(idx)
-    ok = rate >= 0.85 and not core_misses and not leaked
+    lexical_ok = rate >= 0.85 and not core_misses and not leaked
     if core_misses:
         print("FAIL: core-theme regression -", ", ".join(core_misses))
     print("OK: central-theme questions hit, nothing out-of-domain leaks"
-          if ok else "FAIL: retrieval quality below bar")
-    sys.exit(0 if ok else 1)
+          if lexical_ok else "FAIL: retrieval quality below bar")
+
+    semantic_ok = True
+    if semantic.available() and os.environ.get("OPENAI_API_KEY"):
+        semantic_ok = evaluate_semantic()
+    else:
+        print("\n-- semantic: skipped (set OPENAI_API_KEY + run demo/embed.py) --")
+
+    sys.exit(0 if (lexical_ok and semantic_ok) else 1)
 
 
 if __name__ == "__main__":

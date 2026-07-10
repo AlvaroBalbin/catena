@@ -26,7 +26,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "demo"))
 sys.path.insert(0, os.path.join(ROOT, "ingest"))
-from retriever import load_index  # noqa: E402
+from search import load_search  # noqa: E402
 from bible_text import verses_for, latin_for  # noqa: E402
 from scripture import normalize_ref  # noqa: E402
 
@@ -35,7 +35,7 @@ GRAPH = os.path.join(ROOT, "data", "graph")
 
 # --- corpus + graph loaded once ------------------------------------------
 
-_IDX = load_index()
+_IDX, _MODE = load_search()   # semantic if OPENAI_API_KEY + vectors present, else BM25
 _BY_CITATION = {d.citation: d for d in _IDX.docs}
 _BY_ID = {d.id: d for d in _IDX.docs}
 

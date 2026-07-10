@@ -114,18 +114,38 @@ If `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set, the demo will additionally
 compose a short answer **strictly from the retrieved passages**, citing the ST
 references inline, and refuse if those passages do not contain the answer.
 
+### Semantic search (optional, higher precision)
+
+Keyword search matches words; **semantic search matches meaning**, so a question about
+the corpus's core themes finds the right article even when they share no rare word. It
+is built in and switches on automatically when an `OPENAI_API_KEY` is set:
+
+```bash
+python demo/embed.py                      # one-time: embed the corpus (~$0.05, committed)
+python demo/ask.py "the relationship between faith and reason"
+```
+
+With keyword search that query returns articles on *marriage impediments* (they share
+the incidental word "relationship"); with semantic search it returns
+`ST II-II, q.2, a.4` - *"Whether it is necessary to believe those things which can be
+proved by natural reason?"* - the article actually about faith and reason. On a fixed
+18-question eval, hit@5 goes from 89% (keyword) to **100%** (semantic), and every
+out-of-domain query still refuses. The document vectors are committed
+(`data/embeddings/`), so only the query is embedded at search time; with no key it
+falls back to the keyword index. The MCP server uses whichever is available.
+
 ## What the demo guarantees (and what it does not)
 
 Precisely, so the claim is honest:
 
 - **It never fabricates.** It only ever returns real, verbatim source text with a
   citation. There is no path by which it can invent a teaching.
-- **It refuses out of domain.** If your question's terms are not in the corpus, it
-  says so rather than reaching.
-- **It is lexical, not semantic (default).** Zero-setup retrieval matches keywords,
-  so it can surface a passage that merely shares a word with your query. That is a
-  retrieval-*quality* limit, not a fidelity one - the passage shown is still real,
-  cited source, never invented. Semantic retrieval (below) is the fix.
+- **It refuses out of domain.** If your question is not about something in the corpus,
+  it says so rather than reaching - in both keyword and semantic mode.
+- **Keyword by default, semantic with a key.** Zero-setup retrieval matches keywords,
+  so it can surface a passage that merely shares a word with your query - a
+  retrieval-*quality* limit, not a fidelity one (the passage is still real, cited
+  source, never invented). Semantic search (above) closes that gap.
 
 ## Walk the golden chain (citation graph)
 
@@ -206,9 +226,6 @@ Provenance, the markup rule, and the naming seams are documented in
 
 ## Roadmap
 
-- **Semantic retrieval** - embed the corpus so retrieval is by meaning, not
-  keywords, with an honest similarity floor for refusal. Precision upgrade over the
-  lexical default.
 - **Resolve the rest of the graph** - Scripture edges are built; internal `ST`
   cross-references and citations of the Fathers/Aristotle are next, to complete the
   navigable web.

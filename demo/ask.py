@@ -27,7 +27,7 @@ import os
 import sys
 import urllib.request
 
-from retriever import load_index, tokenize
+from search import load_search
 
 
 def refuse(query: str) -> None:
@@ -36,10 +36,11 @@ def refuse(query: str) -> None:
           "than guess - that refusal is the point.)\n")
 
 
-def show_passages(hits) -> None:
-    print("\nPassages the corpus offers on your query (verbatim, cited, public "
-          "domain - read them yourself; this is a lexical match, not a composed "
-          "answer):\n")
+def show_passages(hits, mode="lexical") -> None:
+    kind = "semantic match" if mode == "semantic" else "lexical keyword match"
+    print(f"\nPassages the corpus offers on your query (verbatim, cited, public "
+          f"domain - read them yourself; this is a {kind}, not a composed "
+          f"answer):\n")
     for doc, score in hits:
         print(f"  [{doc.citation}]  {doc.title}")
         snippet = " ".join(doc.text.split())
@@ -122,7 +123,7 @@ def main() -> None:
     args = ap.parse_args()
     query = " ".join(args.query)
 
-    idx = load_index()
+    idx, mode = load_search()
     hits = idx.search(query, k=args.k)
 
     # honest refusal: the retriever returns nothing when the query is out of domain
@@ -136,7 +137,7 @@ def main() -> None:
         print("\n" + answer.strip() + "\n")
         print("Sources:", ", ".join(f"[{d.citation}]" for d, _ in hits))
     else:
-        show_passages(hits)
+        show_passages(hits, mode)
 
 
 if __name__ == "__main__":
