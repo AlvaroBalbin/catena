@@ -31,6 +31,7 @@ def main() -> None:
         rpc(8, "tools/call", {"name": "cross_references", "arguments": {"citation": "ST I, q.2, a.3"}}),
         rpc(9, "tools/call", {"name": "verse_fathers", "arguments": {"reference": "John 1:14"}}),
         rpc(10, "tools/call", {"name": "verse_fathers", "arguments": {"reference": "Genesis 1:1"}}),
+        rpc(11, "tools/call", {"name": "search", "arguments": {"query": "the duties of married people"}}),
     ]
     proc = subprocess.run(
         [sys.executable, SERVER],
@@ -73,7 +74,10 @@ def main() -> None:
     no_fathers = responses[10]["result"]["content"][0]["text"]
     assert no_fathers.startswith("REFUSED"), no_fathers  # Catena covers the Gospels only
 
-    print("OK: MCP server grounds, refuses, serves articles, the Fathers, and walks the graph over stdio")
+    catechism = responses[11]["result"]["content"][0]["text"]
+    assert "Roman Catechism" in catechism, catechism  # the doctrinal spine is searchable
+
+    print("OK: MCP server grounds (Summa + Catechism), refuses, serves articles, the Fathers, and walks the graph over stdio")
 
 
 if __name__ == "__main__":

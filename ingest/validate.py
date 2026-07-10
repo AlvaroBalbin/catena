@@ -39,6 +39,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SUMMA = os.path.join(ROOT, "data", "summa")
 CATENA = os.path.join(ROOT, "data", "catena")
+CATECHISM = os.path.join(ROOT, "data", "catechism")
 BIBLE = os.path.join(ROOT, "data", "bible", "drb")
 VULGATE = os.path.join(ROOT, "data", "bible", "vg")
 
@@ -50,6 +51,11 @@ CATENA_GOSPELS = {"matthew": "Matthew", "mark": "Mark", "luke": "Luke", "john": 
 CATENA_CHAPTERS = {"matthew": 28, "mark": 16, "luke": 24, "john": 21}
 CAT_ID = re.compile(r"^catena\.(matthew|mark|luke|john)\.(\d+)\.(\d+)$")
 CAT_CIT = re.compile(r"^Catena Aurea, (Matthew|Mark|Luke|John) (\d+):(\d+)(?:-(\d+))?$")
+
+# Roman Catechism: id -> (part, unit code, subsection); citation carries Part + unit.
+CATECHISM_ID = re.compile(r"^catechism\.p([1-4])\.([a-z0-9-]+)\.s(\d{2,})$")
+CATECHISM_CIT = re.compile(r"^Roman Catechism, Part (I|II|III|IV), .+ : .+$", re.S)
+CATECHISM_ROMAN = {"1": "I", "2": "II", "3": "III", "4": "IV"}
 
 
 def fail(msg: str) -> None:
@@ -405,11 +411,104 @@ def validate_catena() -> None:
           "segments rejoin to text and every commented verse resolves in the DRB")
 
 
+def validate_catechism() -> None:
+    files = sorted(glob.glob(os.path.join(CATECHISM, "part*.jsonl")))
+    if not files:
+        print("Roman Catechism: not ingested (skipped)")
+        return
+
+    # completeness targets: the numbered units that MUST be present per Part.
+    EXPECTED = {"article": set(range(1, 13)), "sacrament": set(range(1, 8)),
+                "commandment": set(range(1, 11)), "petition": set(range(1, 8))}
+    # unit code -> (unit_type, [numbers]) so the id's code proves which unit is present.
+    UNIT = {}
+    for i in range(1, 13):
+        UNIT[f"art{i}"] = ("article", [i])
+    for i in range(1, 8):
+        UNIT[f"pet{i}"] = ("petition", [i])
+    for i, c in enumerate(["baptism", "confirmation", "eucharist", "penance",
+                           "extreme-unction", "holy-orders", "matrimony"], start=1):
+        UNIT[c] = ("sacrament", [i])
+    for i in range(1, 9):
+        UNIT[f"cmd{i}"] = ("commandment", [i])
+    UNIT["cmd9-10"] = ("commandment", [9, 10])
+
+    ids: set[str] = set()
+    total = 0
+    parts_seen: set[int] = set()
+    present: dict[str, set[int]] = {k: set() for k in EXPECTED}
+
+    for path in files:
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            n = json.loads(line)
+            total += 1
+            nid = n["id"]
+
+            if nid in ids:
+                fail(f"duplicate id {nid}")
+            ids.add(nid)
+
+            if n.get("type") != "catechism":
+                fail(f"unexpected type {n.get('type')!r} on {nid}")
+            if not n.get("text", "").strip():
+                fail(f"empty text: {nid}")
+
+            src = n.get("source") or {}
+            if not src.get("license"):
+                fail(f"missing license: {nid}")
+
+            # lossless: segments rejoin to text exactly
+            segs = n.get("segments", [])
+            if not segs:
+                fail(f"no segments: {nid}")
+            if "\n\n".join(s["text"] for s in segs) != n["text"]:
+                fail(f"lossless invariant broken: {nid}")
+
+            # id <-> citation agreement, and id encodes a known Part + unit
+            im = CATECHISM_ID.match(nid)
+            if not im:
+                fail(f"unparseable id {nid}")
+            if not CATECHISM_CIT.match(n["citation"]):
+                fail(f"unparseable citation {n['citation']!r} on {nid}")
+            part, code = im.group(1), im.group(2)
+            if not n["citation"].startswith(f"Roman Catechism, Part {CATECHISM_ROMAN[part]},"):
+                fail(f"id/citation Part mismatch: {nid} vs {n['citation']}")
+            # title must appear at the end of the citation (canonical addressing)
+            if n.get("title") and not n["citation"].rstrip().endswith(n["title"]):
+                fail(f"citation does not end with the subsection title: {nid}")
+
+            parts_seen.add(int(part))
+            if code in UNIT:
+                utype, nums = UNIT[code]
+                present[utype].update(nums)
+
+            # every citations_out scripture ref must parse via the shared normalizer
+            for c in n.get("citations_out", []):
+                if c.get("kind") == "scripture" and not normalize_ref(c["raw"]):
+                    fail(f"unparseable scripture ref {c['raw']!r} on {nid}")
+
+    # completeness: all four Parts, and every numbered unit within them
+    if parts_seen != {1, 2, 3, 4}:
+        fail(f"missing Parts: {sorted({1,2,3,4} - parts_seen)}")
+    for utype, need in EXPECTED.items():
+        missing = need - present[utype]
+        if missing:
+            fail(f"missing {utype}(s): {sorted(missing)}")
+
+    print(f"Roman Catechism OK: {total} subsections, {len(ids)} unique ids; "
+          "all four Parts, 12 Articles, 7 Sacraments, 10 Commandments, 7 Petitions; "
+          "segments rejoin to text and every citation parses")
+
+
 def main() -> None:
     validate_summa()
     validate_bible()
     validate_vulgate()
     validate_catena()
+    validate_catechism()
     print("lossless, addressable, and complete for the ingested corpus.")
 
 

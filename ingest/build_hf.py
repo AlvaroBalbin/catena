@@ -125,6 +125,25 @@ def build_internal_edges(out):
     return _write_jsonl(rows, os.path.join(out, "internal_edges.jsonl"))
 
 
+def build_catechism(out):
+    """One row per Roman Catechism subsection: its Part, its heading, and full verbatim
+    text - the doctrinal spine, addressable and searchable."""
+    rows = []
+    for f in sorted(glob.glob(os.path.join(DATA, "catechism", "*.jsonl"))):
+        for d in _read_jsonl(f):
+            path = d.get("path", [])
+            rows.append({
+                "id": d["id"],
+                "citation": d["citation"],
+                "part": path[1] if len(path) > 1 else "",
+                "title": d.get("title", ""),
+                "text": d["text"],
+                "work": d.get("work", "roman-catechism"),
+                "license": (d.get("source") or {}).get("license", "public-domain"),
+            })
+    return _write_jsonl(rows, os.path.join(out, "roman_catechism.jsonl"))
+
+
 def _catena_nodes():
     for f in sorted(glob.glob(os.path.join(DATA, "catena", "*.jsonl"))):
         yield from _read_jsonl(f)
@@ -209,6 +228,8 @@ configs:
     data_files: summa.jsonl
   - config_name: catena_aurea
     data_files: catena_aurea.jsonl
+  - config_name: roman_catechism
+    data_files: roman_catechism.jsonl
   - config_name: douay_rheims
     data_files: douay_rheims.jsonl
   - config_name: clementine_vulgate
@@ -237,6 +258,7 @@ Source, ingest code, a live web explorer, and an MCP grounding server:
 |--------|------|------|
 | `summa` | {n_summa} | The Summa Theologica of Thomas Aquinas, one row per article, with its canonical citation (`ST I, q.2, a.3`) and full verbatim text. |
 | `catena_aurea` | {n_catena} | The Catena Aurea - Aquinas's patristic "golden chain" on the four Gospels, one row per verse-pericope: the verse commented on, the Church Fathers in the chain, and their full verbatim commentary. |
+| `roman_catechism` | {n_cat} | The Roman Catechism (Catechism of the Council of Trent), one row per subsection, with its Part and heading and full verbatim text. Public-domain McHugh &amp; Callan translation (1923). |
 | `douay_rheims` | {n_drb} | The Douay-Rheims Bible (Challoner revision), one row per verse, English. |
 | `clementine_vulgate` | {n_vg} | The Clementine Vulgate (Sixto-Clementine, 1592), one row per verse, Latin - keyed identically to the Douay-Rheims so a citation resolves to both languages. |
 | `scripture_edges` | {n_se} | The citation graph: one row per (Summa article -> Scripture verse) edge. |
@@ -275,6 +297,9 @@ Full provenance and the per-text rights reasoning are in
   (1920-22). Public domain.
 - **Catena Aurea** - Aquinas's compilation of the Church Fathers on the Gospels, in the
   Oxford translation edited by J. H. Newman (1841-45). Public domain.
+- **Roman Catechism** (Catechism of the Council of Trent) - tr. J. A. McHugh & C. J.
+  Callan (1923); public domain in the US (pre-1929). A different work from the
+  copyrighted modern Catechism, which is not included.
 - **Douay-Rheims Bible** - Challoner revision (1749-52), via Project Gutenberg #1581.
   Public domain.
 - **Clementine Vulgate** - Sixto-Clementine (1592); electronic edition by The Clementine
@@ -304,6 +329,7 @@ def main():
 
     n_summa = build_summa(out)
     n_catena = build_catena(out)
+    n_cat = build_catechism(out)
     n_drb = build_bible("drb", "douay_rheims.jsonl", out, latin=False)
     n_vg = build_bible("vg", "clementine_vulgate.jsonl", out, latin=True)
     n_se = build_scripture_edges(out)
@@ -311,14 +337,15 @@ def main():
     n_ie = build_internal_edges(out)
     copy_graph(out)
 
-    card = CARD.format(n_summa=f"{n_summa:,}", n_catena=f"{n_catena:,}", n_drb=f"{n_drb:,}",
-                       n_vg=f"{n_vg:,}", n_se=f"{n_se:,}", n_fe=f"{n_fe:,}", n_ie=f"{n_ie:,}")
+    card = CARD.format(n_summa=f"{n_summa:,}", n_catena=f"{n_catena:,}", n_cat=f"{n_cat:,}",
+                       n_drb=f"{n_drb:,}", n_vg=f"{n_vg:,}", n_se=f"{n_se:,}",
+                       n_fe=f"{n_fe:,}", n_ie=f"{n_ie:,}")
     with open(os.path.join(out, "README.md"), "w", encoding="utf-8") as f:
         f.write(card)
 
     print(f"wrote HF bundle to {out}")
-    print(f"  summa: {n_summa}  catena_aurea: {n_catena}  douay_rheims: {n_drb}  "
-          f"clementine_vulgate: {n_vg}")
+    print(f"  summa: {n_summa}  catena_aurea: {n_catena}  roman_catechism: {n_cat}  "
+          f"douay_rheims: {n_drb}  clementine_vulgate: {n_vg}")
     print(f"  scripture_edges: {n_se}  father_edges: {n_fe}  internal_edges: {n_ie}")
 
 

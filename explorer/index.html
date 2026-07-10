@@ -159,8 +159,8 @@
 
 <footer><div class="wrap ui">
   Catena is an open, public-domain corpus: the Summa Theologica, the Catena Aurea (Aquinas's
-  patristic commentary on the Gospels), the Douay-Rheims Bible, and the Clementine Vulgate,
-  with a citation graph and a cite-or-refuse retrieval demo.
+  patristic commentary on the Gospels), the Roman Catechism, the Douay-Rheims Bible, and the
+  Clementine Vulgate, with a citation graph and a cite-or-refuse retrieval demo.
   This page runs entirely in your browser over that open data - nothing you type leaves it.
   &nbsp;<a href="https://github.com/AlvaroBalbin/catena" target="_blank" rel="noopener">Source &amp; data on GitHub &#8599;</a>
 </div></footer>
@@ -253,8 +253,8 @@ function renderLanding(){
     `<span class="chip">${esc(b[0])}<span class="ct">${b[1]}</span></span>`).join("");
   const glossed=(s.most_glossed_verses||[]).slice(0,12).map(v=>
     `<span class="chip" data-go="#/v/${v.key}">${esc(titleRef(v.ref))}<span class="ct">${v.count}</span></span>`).join("");
-  const examples=["is God good","does man have free will","is it lawful to kill in self-defense",
-    "John 1:14","whether happiness consists in wealth","ST I, q.2, a.3","Romans 5"]
+  const examples=["is God good","does man have free will","the duties of married people",
+    "John 1:14","why do we pray to the saints","ST I, q.2, a.3","Romans 5"]
     .map(e=>`<span class="chip" data-ask="${esc(e)}">${esc(e)}</span>`).join("");
   const goldenChain = glossed ? `
     <div class="section-title">The Fathers' golden chain</div>
@@ -305,6 +305,19 @@ function renderArticle(id){
   const [cit,title]=mt;
   if(!BODIES){ view.innerHTML=`<div class="loading"><span class="spin"></span>loading the text...</div>`; return; }
   const body=BODIES[id]||"";
+  // the Roman Catechism carries no citation graph yet - render it as a plain cited
+  // teaching (source line instead of the empty rests-on / cites / cited-by apparatus).
+  if(id.startsWith("catechism.")){
+    view.innerHTML = `<div class="article">
+      <div class="back" data-back>&#8592; back</div>
+      <div class="cite">${esc(cit)}</div>
+      <h2>${esc(title)}</h2>
+      <div class="body">${esc(body)}</div>
+      <div class="chain"><h3>Source</h3>
+        <span class="link">Roman Catechism (Catechism of the Council of Trent), tr. McHugh &amp; Callan, 1923 &middot; public domain</span>
+      </div></div>`;
+    return scrollTo(0,0);
+  }
   const refs=(CORE.article_refs[id]||[]);
   const cites=(CORE.internal_refs[id]||[]);
   const citedBy=(CORE.internal_cited_by[id]||[]);
@@ -444,7 +457,7 @@ async function boot(){
   $("#stats").innerHTML =
     `<span><b>${fmt(m.articles)}</b> Summa articles</span>
      <span><b>${fmt(m.catena_pericopes)}</b> Catena Aurea sections &middot; ${fmt(m.catena_fathers)} Fathers</span>
-     <span><b>${fmt(m.scripture_edges)}</b> Scripture links</span>
+     <span><b>${fmt(m.catechism_sections)}</b> Roman Catechism sections</span>
      <span><b>${fmt(m.verses_en)}</b> verses &middot; Douay-Rheims + Vulgate</span>`;
   route();                                   // landing + verse/citation work from core
   qEl.disabled=false; goEl.disabled=false; qEl.placeholder="Ask a question, a reference, or a citation...";

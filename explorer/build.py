@@ -73,6 +73,18 @@ def load_catena() -> list[dict]:
     return out
 
 
+def load_catechism() -> list[dict]:
+    """The Roman Catechism (Catechism of the Council of Trent), one node per subsection.
+    Doctrinal prose - folded into the searchable/readable passage set beside the Summa."""
+    out = []
+    for f in sorted(glob.glob(os.path.join(DATA, "catechism", "*.jsonl"))):
+        for line in open(f, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                out.append(json.loads(line))
+    return out
+
+
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     arts = load_articles()
@@ -81,6 +93,13 @@ def main() -> None:
     articles_meta = [[a["id"], a["citation"], a.get("title", "")] for a in arts]
     bodies = {a["id"]: a["text"] for a in arts}
     cit2id = {a["citation"]: a["id"] for a in arts}
+
+    # Fold the Roman Catechism into the same searchable + readable passage set as the
+    # Summa (it carries no citation graph yet, so it just reads as a cited teaching).
+    catechism_nodes = load_catechism()
+    for c in catechism_nodes:
+        articles_meta.append([c["id"], c["citation"], c.get("title", "")])
+        bodies[c["id"]] = c["text"]
 
     scripture_index = load_graph("scripture_index")
     stats = load_graph("stats")
@@ -141,6 +160,7 @@ def main() -> None:
             "catena_pericopes": len(catena),
             "catena_fragments": fragments,
             "catena_fathers": len(distinct_fathers),
+            "catechism_sections": len(catechism_nodes),
         },
         "book_slugs": book_slugs,
         "slug_names": slug_names,
@@ -181,6 +201,7 @@ def main() -> None:
           f"internal edges: {core['meta']['internal_edges']}")
     print(f"catena: {len(catena)} pericopes  {fragments} fragments  "
           f"{len(distinct_fathers)} Fathers  {len(fathers_index)} glossed verses")
+    print(f"catechism: {len(catechism_nodes)} sections (searchable + readable)")
 
 
 if __name__ == "__main__":

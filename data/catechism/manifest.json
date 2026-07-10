@@ -1,0 +1,347 @@
+{
+  "work": "roman-catechism",
+  "title": "Catechism of the Council of Trent (Roman Catechism)",
+  "author": "Catholic Church (issued by order of Pope St. Pius V, 1566)",
+  "edition": "Catechism of the Council of Trent, tr. J. A. McHugh & C. J. Callan (1923)",
+  "translator": "John A. McHugh, O.P. and Charles J. Callan, O.P.",
+  "license": "public-domain",
+  "source": "http://www.catholicapologetics.info/thechurch/catechism/",
+  "retrieved": "2026-07-10",
+  "structure": [
+    "work",
+    "part",
+    "unit",
+    "subsection"
+  ],
+  "node_granularity": "one subsection (a headed analytical teaching unit within a Part)",
+  "scripture_citations": "This edition quotes Scripture inline without chapter:verse references (the McHugh-Callan references are footnotes dropped by every clean digitisation); citations_out is therefore empty. No citation graph is reconstructed from a different digitisation's OCR footnotes - a wrong citation is worse than none.",
+  "completeness": {
+    "articles": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "sacraments": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "commandments": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "petitions": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "parts": [
+    {
+      "part": "I",
+      "name": "The Creed",
+      "file": "data/catechism/part1.jsonl",
+      "subsections": 173,
+      "units": [
+        {
+          "code": "prologue",
+          "label": "Prologue: On Faith and the Creed",
+          "type": "intro",
+          "subsections": 5
+        },
+        {
+          "code": "art1",
+          "label": "Article 1",
+          "type": "article",
+          "subsections": 31
+        },
+        {
+          "code": "art2",
+          "label": "Article 2",
+          "type": "article",
+          "subsections": 7
+        },
+        {
+          "code": "art3",
+          "label": "Article 3",
+          "type": "article",
+          "subsections": 8
+        },
+        {
+          "code": "art4",
+          "label": "Article 4",
+          "type": "article",
+          "subsections": 20
+        },
+        {
+          "code": "art5",
+          "label": "Article 5",
+          "type": "article",
+          "subsections": 12
+        },
+        {
+          "code": "art6",
+          "label": "Article 6",
+          "type": "article",
+          "subsections": 13
+        },
+        {
+          "code": "art7",
+          "label": "Article 7",
+          "type": "article",
+          "subsections": 11
+        },
+        {
+          "code": "art8",
+          "label": "Article 8",
+          "type": "article",
+          "subsections": 11
+        },
+        {
+          "code": "art9",
+          "label": "Article 9",
+          "type": "article",
+          "subsections": 16
+        },
+        {
+          "code": "art10",
+          "label": "Article 10",
+          "type": "article",
+          "subsections": 10
+        },
+        {
+          "code": "art11",
+          "label": "Article 11",
+          "type": "article",
+          "subsections": 13
+        },
+        {
+          "code": "art12",
+          "label": "Article 12",
+          "type": "article",
+          "subsections": 16
+        }
+      ]
+    },
+    {
+      "part": "II",
+      "name": "The Sacraments",
+      "file": "data/catechism/part2.jsonl",
+      "subsections": 333,
+      "units": [
+        {
+          "code": "general",
+          "label": "On the Sacraments in General",
+          "type": "intro",
+          "subsections": 27
+        },
+        {
+          "code": "baptism",
+          "label": "The Sacrament of Baptism",
+          "type": "sacrament",
+          "subsections": 58
+        },
+        {
+          "code": "confirmation",
+          "label": "The Sacrament of Confirmation",
+          "type": "sacrament",
+          "subsections": 27
+        },
+        {
+          "code": "eucharist",
+          "label": "The Sacrament of the Holy Eucharist",
+          "type": "sacrament",
+          "subsections": 47
+        },
+        {
+          "code": "penance",
+          "label": "The Sacrament of Penance",
+          "type": "sacrament",
+          "subsections": 84
+        },
+        {
+          "code": "extreme-unction",
+          "label": "The Sacrament of Extreme Unction",
+          "type": "sacrament",
+          "subsections": 18
+        },
+        {
+          "code": "holy-orders",
+          "label": "The Sacrament of Holy Orders",
+          "type": "sacrament",
+          "subsections": 37
+        },
+        {
+          "code": "matrimony",
+          "label": "The Sacrament of Matrimony",
+          "type": "sacrament",
+          "subsections": 35
+        }
+      ]
+    },
+    {
+      "part": "III",
+      "name": "The Ten Commandments",
+      "file": "data/catechism/part3.jsonl",
+      "subsections": 217,
+      "units": [
+        {
+          "code": "decalogue",
+          "label": "On the Decalogue",
+          "type": "intro",
+          "subsections": 13
+        },
+        {
+          "code": "cmd1",
+          "label": "The First Commandment",
+          "type": "commandment",
+          "subsections": 26
+        },
+        {
+          "code": "cmd2",
+          "label": "The Second Commandment",
+          "type": "commandment",
+          "subsections": 26
+        },
+        {
+          "code": "cmd3",
+          "label": "The Third Commandment",
+          "type": "commandment",
+          "subsections": 25
+        },
+        {
+          "code": "cmd4",
+          "label": "The Fourth Commandment",
+          "type": "commandment",
+          "subsections": 17
+        },
+        {
+          "code": "cmd5",
+          "label": "The Fifth Commandment",
+          "type": "commandment",
+          "subsections": 19
+        },
+        {
+          "code": "cmd6",
+          "label": "The Sixth Commandment",
+          "type": "commandment",
+          "subsections": 21
+        },
+        {
+          "code": "cmd7",
+          "label": "The Seventh Commandment",
+          "type": "commandment",
+          "subsections": 27
+        },
+        {
+          "code": "cmd8",
+          "label": "The Eighth Commandment",
+          "type": "commandment",
+          "subsections": 23
+        },
+        {
+          "code": "cmd9-10",
+          "label": "The Ninth and Tenth Commandments",
+          "type": "commandment",
+          "subsections": 20
+        }
+      ]
+    },
+    {
+      "part": "IV",
+      "name": "The Lord's Prayer",
+      "file": "data/catechism/part4.jsonl",
+      "subsections": 206,
+      "units": [
+        {
+          "code": "on-prayer",
+          "label": "On Prayer",
+          "type": "intro",
+          "subsections": 61
+        },
+        {
+          "code": "our-father",
+          "label": "The Address: \"Our Father Who Art in Heaven\"",
+          "type": "preface",
+          "subsections": 15
+        },
+        {
+          "code": "pet1",
+          "label": "The First Petition",
+          "type": "petition",
+          "subsections": 10
+        },
+        {
+          "code": "pet2",
+          "label": "The Second Petition",
+          "type": "petition",
+          "subsections": 17
+        },
+        {
+          "code": "pet3",
+          "label": "The Third Petition",
+          "type": "petition",
+          "subsections": 19
+        },
+        {
+          "code": "pet4",
+          "label": "The Fourth Petition",
+          "type": "petition",
+          "subsections": 22
+        },
+        {
+          "code": "pet5",
+          "label": "The Fifth Petition",
+          "type": "petition",
+          "subsections": 23
+        },
+        {
+          "code": "pet6",
+          "label": "The Sixth Petition",
+          "type": "petition",
+          "subsections": 18
+        },
+        {
+          "code": "pet7",
+          "label": "The Seventh Petition",
+          "type": "petition",
+          "subsections": 11
+        },
+        {
+          "code": "amen",
+          "label": "Conclusion: Amen",
+          "type": "conclusion",
+          "subsections": 10
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "subsections": 929
+  }
+}

@@ -25,15 +25,17 @@ Nothing is charged to use the open corpus. The aim is to make grounded, honest C
 
 ## Load the dataset (Hugging Face)
 
-The corpus is published as a dataset on the Hugging Face Hub, loadable in one line - the Summa, both Bibles, and the citation graph as tabular edges:
+The corpus is published as a dataset on the Hugging Face Hub, loadable in one line - the Summa, the Catena Aurea, the Roman Catechism, both Bibles, and the citation graph as tabular edges:
 
 ```python
 from datasets import load_dataset
 
-summa  = load_dataset("TheAlvaroBalbin/catena", "summa")               # 3,115 articles
-verses = load_dataset("TheAlvaroBalbin/catena", "douay_rheims")        # 35,786 verses (English)
-latin  = load_dataset("TheAlvaroBalbin/catena", "clementine_vulgate")  # 35,809 verses (Latin)
-edges  = load_dataset("TheAlvaroBalbin/catena", "scripture_edges")     # article -> verse citation graph
+summa     = load_dataset("TheAlvaroBalbin/catena", "summa")             # 3,115 articles
+fathers   = load_dataset("TheAlvaroBalbin/catena", "catena_aurea")      # 814 Gospel pericopes, 51 Fathers
+catechism = load_dataset("TheAlvaroBalbin/catena", "roman_catechism")  # 929 sections (Trent)
+verses    = load_dataset("TheAlvaroBalbin/catena", "douay_rheims")      # 35,786 verses (English)
+latin     = load_dataset("TheAlvaroBalbin/catena", "clementine_vulgate")# 35,809 verses (Latin)
+edges     = load_dataset("TheAlvaroBalbin/catena", "scripture_edges")   # article -> verse citation graph
 ```
 
 Dataset: **https://huggingface.co/datasets/TheAlvaroBalbin/catena**
@@ -55,6 +57,7 @@ Dataset: **https://huggingface.co/datasets/TheAlvaroBalbin/catena**
 |------|----------------------|--------|--------|
 | Summa Theologica | Fathers of the English Dominican Province, 2nd ed. 1920-22 | Public domain | in corpus (3,115 articles) |
 | Catena Aurea (Church Fathers on the Gospels) | Newman / Oxford translation, 1841-45 | Public domain | in corpus (814 pericopes, 12,692 fragments, 51 Fathers, verse-keyed) |
+| Roman Catechism (Council of Trent) | McHugh & Callan translation, 1923 | Public domain (pre-1929) | in corpus (929 sections, searchable) |
 | Douay-Rheims Bible | Challoner revision (Project Gutenberg #1581) | Public domain | in corpus (35,786 verses, 73 books) |
 | Clementine Vulgate | Sixto-Clementine 1592 (Clementine Vulgate Project e-text) | Public domain | in corpus (35,809 verses, parallel Latin) |
 | Church Fathers (full works) | Schaff, Ante/Nicene/Post-Nicene Fathers, 1885-1900 | Public domain | roadmap |
@@ -270,4 +273,4 @@ The **code** in this repository is MIT (see [`LICENSE`](LICENSE)). The **texts**
 
 ## Status
 
-Early but real. The Summa, the Catena Aurea (the Fathers on the four Gospels), and both Bibles are in the corpus, each structurally validated. Foundations first, then scale one text at a time - never a partial or unverified corpus passed off as complete.
+Early but real. The Summa, the Catena Aurea (the Fathers on the four Gospels), the Roman Catechism, and both Bibles are in the corpus, each structurally validated. Foundations first, then scale one text at a time - never a partial or unverified corpus passed off as complete.

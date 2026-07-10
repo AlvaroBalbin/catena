@@ -7,7 +7,7 @@ newline-delimited JSON-RPC 2.0) with no third-party dependencies, so any MCP cli
 corpus does not contain it.
 
 Tools:
-  search(query, k)          grounded passages (verbatim + citation), or a refusal
+  search(query, k)          grounded passages from the Summa + Roman Catechism, or a refusal
   get_article(citation)     the full verbatim article at an ST citation
   lookup_verse(reference)   verbatim verse text (Douay-Rheims + Vulgate Latin) + citers
   verse_fathers(reference)  the Church Fathers on a Gospel verse (Catena Aurea), verbatim
@@ -199,10 +199,11 @@ def tool_cross_references(citation: str) -> str:
 TOOLS = [
     {
         "name": "search",
-        "description": "Search the Summa Theologica for grounded, cited passages that "
-                       "answer a question. Returns verbatim source with ST citations, "
-                       "or REFUSED if the corpus does not contain the answer. Never "
-                       "fabricate beyond what this returns.",
+        "description": "Search the Summa Theologica and the Roman Catechism for grounded, "
+                       "cited passages that answer a question. Returns verbatim source "
+                       "with its citation (an ST reference or a Roman Catechism section), "
+                       "or REFUSED if the corpus does not contain the answer. Cite the "
+                       "reference for any claim you use; never fabricate beyond this.",
         "inputSchema": {
             "type": "object",
             "properties": {

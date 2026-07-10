@@ -26,6 +26,7 @@ from crossref import parse_internal_refs
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SUMMA = os.path.join(ROOT, "data", "summa")
 CATENA = os.path.join(ROOT, "data", "catena")
+CATECHISM = os.path.join(ROOT, "data", "catechism")
 OUT = os.path.join(ROOT, "data", "graph")
 
 
@@ -160,6 +161,7 @@ def main() -> None:
     print("most-cited articles:", ", ".join(f"{a['citation']}({a['in_degree']})" for a in mca))
 
     build_catena_graph()
+    build_catechism_graph()
 
 
 def build_catena_graph() -> None:
@@ -227,6 +229,78 @@ def build_catena_graph() -> None:
 
     print(f"catena: {len(nodes)} pericopes, {len(fathers_index_sorted)} commented "
           f"verse keys indexed, {edge_total} Father scripture cross-ref edges")
+
+
+def build_catechism_graph() -> None:
+    """Emit the Roman Catechism's Scripture graph, kept in SEPARATE files so the
+    Summa's scripture_index.json (which test_graph.py asserts is Summa-only) is never
+    touched:
+
+      catechism_scripture_edges.json  catechism id -> [ normalized ref strings ] : the
+                                      Scripture the Catechism cites in that subsection.
+      catechism_index.json            verse/chapter key -> [ {id, citation, title,
+                                      work} ] : from a verse, every Catechism subsection
+                                      that cites it (the "what does the Catechism teach
+                                      citing this verse" join).
+
+    Built entirely from each node's citations_out via the shared normalize_ref, exactly
+    as the Summa graph is. Note: the McHugh-Callan edition quotes Scripture inline
+    without chapter:verse markers, so citations_out is empty for this corpus and these
+    files are therefore empty; the machinery is correct and will populate the moment a
+    referenced edition is ingested (see ingest/catechism.py)."""
+    files = sorted(glob.glob(os.path.join(CATECHISM, "*.jsonl")))
+    if not files:
+        print("catechism: not ingested (graph skipped)")
+        return
+
+    nodes = []
+    for f in files:
+        for line in open(f, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                nodes.append(json.loads(line))
+
+    scripture_edges: dict[str, list] = {}
+    index: dict[str, list] = defaultdict(list)
+    edge_total = 0
+
+    for n in nodes:
+        refs = []
+        seen_refs: set[str] = set()
+        seen_keys: set[str] = set()
+        for c in n.get("citations_out", []):
+            if c.get("kind") != "scripture":
+                continue
+            norm = normalize_ref(c["raw"])
+            if not norm:
+                continue
+            if norm["ref"] not in seen_refs:
+                seen_refs.add(norm["ref"])
+                refs.append(norm["ref"])
+            entry_keys = set(norm["verse_keys"]) | {norm["chapter_key"]}
+            for k in entry_keys:
+                if k in seen_keys:
+                    continue
+                seen_keys.add(k)
+                index[k].append({
+                    "id": n["id"], "citation": n["citation"],
+                    "title": n.get("title", ""), "work": "roman-catechism",
+                })
+        if refs:
+            scripture_edges[n["id"]] = refs
+            edge_total += len(refs)
+
+    scripture_edges_sorted = {k: scripture_edges[k] for k in sorted(scripture_edges)}
+    index_sorted = {k: index[k] for k in sorted(index)}
+
+    with open(os.path.join(OUT, "catechism_scripture_edges.json"), "w", encoding="utf-8") as fh:
+        json.dump(scripture_edges_sorted, fh, ensure_ascii=False, indent=0)
+    with open(os.path.join(OUT, "catechism_index.json"), "w", encoding="utf-8") as fh:
+        json.dump(index_sorted, fh, ensure_ascii=False, indent=0)
+
+    note = "" if edge_total else " (inline chapter:verse refs absent in this edition)"
+    print(f"catechism: {len(nodes)} subsections, {edge_total} scripture cross-ref "
+          f"edges, {len(index_sorted)} cited verse keys indexed{note}")
 
 
 if __name__ == "__main__":
