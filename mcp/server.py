@@ -10,6 +10,7 @@ Tools:
   search(query, k)          grounded passages (verbatim + citation), or a refusal
   get_article(citation)     the full verbatim article at an ST citation
   lookup_verse(reference)   verbatim verse text (Douay-Rheims + Vulgate Latin) + citers
+  verse_fathers(reference)  the Church Fathers on a Gospel verse (Catena Aurea), verbatim
   article_scripture(citation)  the Scripture an article rests on
 
 Run standalone:  python mcp/server.py   (then speak JSON-RPC on stdin)
@@ -18,6 +19,7 @@ Wire into a client: see mcp/README.md
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
@@ -49,6 +51,23 @@ _SCRIPTURE_INDEX = _load_graph("scripture_index.json")
 _ARTICLE_REFS = _load_graph("article_refs.json")
 _INTERNAL_REFS = _load_graph("internal_refs.json")
 _INTERNAL_CITED_BY = _load_graph("internal_cited_by.json")
+_FATHERS_INDEX = _load_graph("fathers_index.json")   # Gospel verse -> Catena Aurea pericopes
+
+
+def _load_catena() -> dict:
+    """The Catena Aurea pericopes by id, each carrying its ordered Father-attributed
+    fragments - so the endpoint can return what the Fathers said on a verse, verbatim."""
+    out = {}
+    for f in glob.glob(os.path.join(ROOT, "data", "catena", "*.jsonl")):
+        for line in open(f, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                d = json.loads(line)
+                out[d["id"]] = d
+    return out
+
+
+_CATENA_BY_ID = _load_catena()
 
 
 def _citation_to_id(citation: str) -> str | None:
@@ -110,9 +129,44 @@ def tool_lookup_verse(reference: str) -> str:
     elif verses:
         lines.append(f'No Summa article cites {norm["ref"]}.')
 
+    if _FATHERS_INDEX.get(key):
+        lines.append(f'The Church Fathers comment on {norm["ref"]} in the Catena Aurea '
+                     f'(call verse_fathers for the verbatim chain).')
+
     if not lines:
         return (f'The corpus contains no verse text and no article citing {norm["ref"]}.')
     return "\n".join(lines).strip()
+
+
+def tool_verse_fathers(reference: str) -> str:
+    """The patristic golden chain on a Gospel verse: what the Church Fathers said,
+    verbatim, from Aquinas's Catena Aurea, each fragment attributed to its Father."""
+    norm = normalize_ref(reference)
+    if not norm:
+        return f'Could not parse a Scripture reference from "{reference}".'
+    if norm["verse_start"] is None:
+        keys = sorted(k for k in _FATHERS_INDEX if k.startswith(norm["chapter_key"] + "/"))
+    else:
+        keys = norm["verse_keys"]
+    seen, pericope_ids = set(), []
+    for k in keys:
+        for e in _FATHERS_INDEX.get(k, []):
+            if e["id"] not in seen:
+                seen.add(e["id"])
+                pericope_ids.append(e["id"])
+    if not pericope_ids:
+        return (f'REFUSED: the Catena Aurea (Aquinas\'s patristic chain, the four Gospels '
+                f'only) has no comment on {norm["ref"]}. Do not invent what the Fathers said.')
+    out = [f'The Church Fathers on {norm["ref"]}, from Aquinas\'s Catena Aurea (verbatim - '
+           f'attribute each quotation to the named Father):']
+    for pid in pericope_ids:
+        n = _CATENA_BY_ID.get(pid)
+        if not n:
+            continue
+        out.append(f'\n{n["citation"]} - "{n["lemma"]}"')
+        for s in n["segments"]:
+            out.append(f'  [{s["father"]}] {s["text"]}')
+    return "\n".join(out)
 
 
 def tool_article_scripture(citation: str) -> str:
@@ -183,6 +237,21 @@ TOOLS = [
             "required": ["reference"],
         },
         "handler": lambda a: tool_lookup_verse(a["reference"]),
+    },
+    {
+        "name": "verse_fathers",
+        "description": "Return what the Church Fathers said on a Gospel verse, e.g. "
+                       "'John 1:14' - the verbatim patristic chain from Aquinas's Catena "
+                       "Aurea, each quotation attributed to its Father (Augustine, "
+                       "Chrysostom, Bede, ...). Covers the four Gospels only; refuses "
+                       "elsewhere. Attribute each quote to the named Father; never invent "
+                       "a patristic source.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"reference": {"type": "string"}},
+            "required": ["reference"],
+        },
+        "handler": lambda a: tool_verse_fathers(a["reference"]),
     },
     {
         "name": "article_scripture",

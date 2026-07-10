@@ -1,16 +1,27 @@
 # Catena
 
-**An open, structured, verbatim, and fully-cited corpus of the Catholic tradition, built for grounded retrieval.**
+**The grounding layer for Catholic AI: an open, verbatim, fully-cited corpus of the tradition, with a citation graph and a cite-or-refuse endpoint any assistant can build on.**
 
-Most "Catholic AI" fails at one thing: it invents. It answers with confidence and no source, or misattributes a teaching, or paraphrases the Magisterium into something it never said. Catena exists to make the opposite easy.
+Most "Catholic AI" fails at one thing: it invents. It answers with confidence and no source, misattributes a teaching, or paraphrases the Magisterium into something it never said. For a parish, a publisher, or a diocese that is not a rough edge - it is a machine that misquotes the Church, a liability no institution can put its name on. Catena exists to make the opposite the easy path.
 
-Catena is a clean, machine-readable corpus of public-domain Catholic texts where **every unit of text carries a canonical citation** (e.g. `ST II-II, q.1, a.1`), the text is stored **verbatim** (never paraphrased or truncated), and the retrieval demo is built to **cite or refuse** - it answers only from what it actually retrieved, quotes the source, and says "I don't have that in the corpus" rather than guessing.
+Catena is a clean, machine-readable corpus of public-domain Catholic texts where **every unit of text carries a canonical citation** (e.g. `ST II-II, q.1, a.1`), the text is stored **verbatim** (never paraphrased or truncated), and retrieval is built to **cite or refuse** - it answers only from what it actually retrieved, quotes the source, and says "I don't have that in the corpus" rather than guessing. Point an assistant at it, over the MCP endpoint or the dataset, and its Catholic answers come back as real cited source or an honest refusal.
 
-The name is from the *Catena Aurea*, Aquinas's "golden chain" of sourced quotations from the Church Fathers. The point then was the same as now: never assert without a source in the chain.
+The name is from the *Catena Aurea*, Aquinas's "golden chain" of sourced quotations from the Church Fathers, now itself in the corpus. The point then was the same as now: never assert without a source in the chain.
+
+## For builders and institutions
+
+If you are building anything that answers questions about the Catholic faith - an app, a study tool, a parish or diocesan assistant, a publisher's back catalogue - you have one hard problem: it must not invent doctrine. Catena is the layer that solves it, and it is free and open to adopt:
+
+- **Ground your assistant in it over MCP.** One line wires the endpoint into an MCP client ([below](#ground-any-ai-in-it-mcp)); every answer is verbatim cited source or an explicit refusal. No fine-tune, no prompt-craft, no hallucinated Councils.
+- **Or load the dataset.** The whole corpus and citation graph are on the Hugging Face Hub, one `load_dataset` call ([below](#load-the-dataset-hugging-face)).
+- **Verifiable by design.** Every unit traces to a named print edition, so any claim can be checked against the book on a shelf. That is the property an institution actually needs before it trusts a machine with its teaching.
+- **Your own texts, grounded the same way.** The open corpus is public-domain text. The same discipline extends to an organisation's own material (catechetical resources, an order's archive, a bishop's writings), grounded and cited under permission rather than scraped. If that is you, open an issue or reach out.
+
+Nothing is charged to use the open corpus. The aim is to make grounded, honest Catholic AI the default, and to be the reference layer it stands on.
 
 ## Try it live (no install)
 
-**[Open the explorer &#8594;](https://alvarobalbin.github.io/catena/explorer/)** - ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the chain of Scripture behind them, in English and the Latin Vulgate; watch it refuse when the corpus does not contain the answer. It runs entirely in your browser over the open data in this repo - no server, no key, nothing you type leaves the page.
+**[Open the explorer &#8594;](https://alvarobalbin.github.io/catena/explorer/)** - ask a question and read the actual passages Aquinas wrote and the Church Fathers he chained together, verbatim and cited; on any Gospel verse, read what the Fathers said, in their own words; walk the Scripture behind it in English and the Latin Vulgate; watch it refuse when the corpus does not contain the answer. It runs entirely in your browser over the open data in this repo - no server, no key, nothing you type leaves the page.
 
 ## Load the dataset (Hugging Face)
 
@@ -29,7 +40,7 @@ Dataset: **https://huggingface.co/datasets/TheAlvaroBalbin/catena**
 
 ## What this is (and is not)
 
-- **It is a dataset + a reference retrieval demo.** The dataset is the deliverable. The demo exists to prove the discipline (grounded, cited, refuses to hallucinate), not to be a product.
+- **It is infrastructure, not a chatbot.** The deliverable is the corpus, the citation graph, and the grounding endpoint - the layer other things build on. The explorer and the CLI demo exist to *prove* the discipline (grounded, cited, refuses to hallucinate) on a page you can check for yourself, not to be the product themselves.
 - **It is only public-domain and freely-licensed texts.** We do not, and will not, redistribute copyrighted texts (the modern Catechism, modern encyclical translations, modern Bible translations) without written permission from the rights holder. See [`data/SOURCES.md`](data/SOURCES.md) for the per-text rights map. Doing this wrong - pirating the Church's own texts under an "open" banner - would betray the whole point.
 
 ## The three disciplines
@@ -43,9 +54,10 @@ Dataset: **https://huggingface.co/datasets/TheAlvaroBalbin/catena**
 | Text | Edition / translation | Rights | Status |
 |------|----------------------|--------|--------|
 | Summa Theologica | Fathers of the English Dominican Province, 2nd ed. 1920-22 | Public domain | in corpus (3,115 articles) |
+| Catena Aurea (Church Fathers on the Gospels) | Newman / Oxford translation, 1841-45 | Public domain | in corpus (814 pericopes, 12,692 fragments, 51 Fathers, verse-keyed) |
 | Douay-Rheims Bible | Challoner revision (Project Gutenberg #1581) | Public domain | in corpus (35,786 verses, 73 books) |
 | Clementine Vulgate | Sixto-Clementine 1592 (Clementine Vulgate Project e-text) | Public domain | in corpus (35,809 verses, parallel Latin) |
-| Church Fathers | Schaff, Ante/Nicene/Post-Nicene Fathers, 1885-1900 | Public domain | roadmap |
+| Church Fathers (full works) | Schaff, Ante/Nicene/Post-Nicene Fathers, 1885-1900 | Public domain | roadmap |
 | Older encyclicals / councils | pre-1930 English translations | Public domain (verify per-doc) | roadmap |
 | Catechism of the Catholic Church | USCCB/LEV | **Copyright - permission track** | not redistributed; see SOURCES.md |
 
@@ -234,9 +246,9 @@ Provenance, the markup rule, and the naming seams are documented in
 
 ## Ground any AI in it (MCP)
 
-Catena ships an MCP server so any assistant (Claude, etc.) can ground a Catholic
-answer in real, cited source - or be told the corpus does not contain it. Stdlib
-only, standard stdio JSON-RPC.
+This is the grounding endpoint builders integrate. Catena ships an MCP server so any
+assistant (Claude, etc.) can ground a Catholic answer in real, cited source - or be told
+the corpus does not contain it. Stdlib only, standard stdio JSON-RPC.
 
 ```bash
 claude mcp add catena -- python /absolute/path/to/catena/mcp/server.py
@@ -244,8 +256,9 @@ claude mcp add catena -- python /absolute/path/to/catena/mcp/server.py
 
 Tools: `search` (grounded passages or a refusal), `get_article`, `lookup_verse`
 (returns the verbatim Douay-Rheims English and the parallel Clementine Vulgate Latin,
-plus the articles that lean on the verse), `article_scripture`, `cross_references`.
-See [`mcp/README.md`](mcp/README.md).
+plus the articles that lean on the verse), `verse_fathers` (the Church Fathers on a
+Gospel verse, verbatim, from the Catena Aurea, each quotation attributed to its Father),
+`article_scripture`, `cross_references`. See [`mcp/README.md`](mcp/README.md).
 - **More public-domain texts** - Church Fathers (Schaff), pre-1930 encyclicals and
   councils, each with a verified `SOURCES.md` entry.
 - **Catechism** - only if/when USCCB grants written permission (see
@@ -257,4 +270,4 @@ The **code** in this repository is MIT (see [`LICENSE`](LICENSE)). The **texts**
 
 ## Status
 
-Early. v1 is the Summa. Foundations first, then scale one text at a time with structural validation - never a partial or unverified corpus passed off as complete.
+Early but real. The Summa, the Catena Aurea (the Fathers on the four Gospels), and both Bibles are in the corpus, each structurally validated. Foundations first, then scale one text at a time - never a partial or unverified corpus passed off as complete.

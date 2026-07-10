@@ -13,6 +13,7 @@ No third-party dependencies: stdio, newline-delimited JSON-RPC 2.0, stdlib only.
 | `search(query, k)` | grounded, cited passages that answer a question - or `REFUSED` if the corpus has no answer |
 | `get_article(citation)` | the full verbatim article at a citation, e.g. `ST I, q.2, a.3` |
 | `lookup_verse(reference)` | the verbatim Douay-Rheims text of a verse/chapter, e.g. `John 1:14`, plus every article that leans on it |
+| `verse_fathers(reference)` | the Church Fathers on a Gospel verse, e.g. `John 1:14`, verbatim from the Catena Aurea, each quotation attributed to its Father; refuses outside the four Gospels |
 | `article_scripture(citation)` | the Scripture an article rests on |
 | `cross_references(citation)` | the other articles an article cites and is cited by |
 

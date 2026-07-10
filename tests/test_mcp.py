@@ -29,6 +29,8 @@ def main() -> None:
         rpc(6, "tools/call", {"name": "lookup_verse", "arguments": {"reference": "John 1:14"}}),
         rpc(7, "tools/call", {"name": "get_article", "arguments": {"citation": "ST I, q.1, a.1"}}),
         rpc(8, "tools/call", {"name": "cross_references", "arguments": {"citation": "ST I, q.2, a.3"}}),
+        rpc(9, "tools/call", {"name": "verse_fathers", "arguments": {"reference": "John 1:14"}}),
+        rpc(10, "tools/call", {"name": "verse_fathers", "arguments": {"reference": "Genesis 1:1"}}),
     ]
     proc = subprocess.run(
         [sys.executable, SERVER],
@@ -47,8 +49,8 @@ def main() -> None:
     assert responses[1]["result"]["serverInfo"]["name"] == "catena"
 
     names = {t["name"] for t in responses[2]["result"]["tools"]}
-    assert names == {"search", "get_article", "lookup_verse", "article_scripture",
-                     "cross_references"}, names
+    assert names == {"search", "get_article", "lookup_verse", "verse_fathers",
+                     "article_scripture", "cross_references"}, names
 
     grounded = responses[3]["result"]["content"][0]["text"]
     assert "ST I, q.1, a.2" in grounded and "grounded passage" in grounded
@@ -65,7 +67,13 @@ def main() -> None:
     xref = responses[8]["result"]["content"][0]["text"]
     assert "is cited by" in xref and "ST I, q.3, a.7" in xref
 
-    print("OK: MCP server grounds, refuses, serves articles, and walks the graph over stdio")
+    fathers = responses[9]["result"]["content"][0]["text"]
+    assert "Augustine" in fathers and "Catena Aurea, John 1:14" in fathers \
+        and "made flesh" in fathers, fathers
+    no_fathers = responses[10]["result"]["content"][0]["text"]
+    assert no_fathers.startswith("REFUSED"), no_fathers  # Catena covers the Gospels only
+
+    print("OK: MCP server grounds, refuses, serves articles, the Fathers, and walks the graph over stdio")
 
 
 if __name__ == "__main__":
