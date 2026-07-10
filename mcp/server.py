@@ -9,7 +9,7 @@ corpus does not contain it.
 Tools:
   search(query, k)          grounded passages (verbatim + citation), or a refusal
   get_article(citation)     the full verbatim article at an ST citation
-  lookup_verse(reference)   every article that leans on a Scripture verse/chapter
+  lookup_verse(reference)   verbatim verse text (Douay-Rheims + Vulgate Latin) + citers
   article_scripture(citation)  the Scripture an article rests on
 
 Run standalone:  python mcp/server.py   (then speak JSON-RPC on stdin)
@@ -27,7 +27,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "demo"))
 sys.path.insert(0, os.path.join(ROOT, "ingest"))
 from retriever import load_index  # noqa: E402
-from bible_text import verses_for  # noqa: E402
+from bible_text import verses_for, latin_for  # noqa: E402
 from scripture import normalize_ref  # noqa: E402
 
 PROTOCOL_VERSION = "2024-11-05"
@@ -91,10 +91,15 @@ def tool_lookup_verse(reference: str) -> str:
 
     lines: list[str] = []
     verses = verses_for(norm)
+    latin = latin_for(norm)
     if verses:
-        lines.append(f'{norm["ref"]} (Douay-Rheims, verbatim):')
+        label = "Douay-Rheims + Clementine Vulgate" if latin else "Douay-Rheims"
+        lines.append(f'{norm["ref"]} ({label}, verbatim):')
         for d in verses:
             lines.append(f'  {d["citation"]} {d["text"]}')
+            la = latin.get(f'{norm["slug"]}/{d["chapter"]}/{d["verse"]}')
+            if la:
+                lines.append(f'    (Vulgate: {la})')
         lines.append("")
 
     hits = _SCRIPTURE_INDEX.get(key, [])
@@ -167,8 +172,9 @@ TOOLS = [
     },
     {
         "name": "lookup_verse",
-        "description": "Return the verbatim Douay-Rheims text of a Scripture verse or "
-                       "chapter, e.g. 'John 1:14' or 'Romans 5', together with every "
+        "description": "Return the verbatim text of a Scripture verse or chapter, e.g. "
+                       "'John 1:14' or 'Romans 5' - the Douay-Rheims English and, in "
+                       "parallel, the Clementine Vulgate Latin - together with every "
                        "Summa article that leans on it. Cite the reference for any "
                        "verse text you use; do not paraphrase it as your own.",
         "inputSchema": {

@@ -17,6 +17,14 @@ Douay-Rheims Bible (if ingested):
      (completeness), starting at verse 1 save the documented Vulgate psalm splits
   4. every verse's text appears verbatim in the raw source (lossless), when the source
      cache is present
+
+Clementine Vulgate (if ingested):
+  1. every verse node has a unique id, non-empty Latin text (lang la), a license, and
+     no leaked markup or unexpected non-ASCII beyond the edition's Latin ligatures
+  2. id, citation, and verse_key agree with the node's book/chapter/verse
+  3. every book present with its known chapter count; verses unique and contiguous
+  4. every verse re-derives exactly from the raw source under the documented cleaner
+     (lossless), when the per-book source cache is present
 """
 
 from __future__ import annotations
@@ -31,6 +39,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SUMMA = os.path.join(ROOT, "data", "summa")
 BIBLE = os.path.join(ROOT, "data", "bible", "drb")
+VULGATE = os.path.join(ROOT, "data", "bible", "vg")
 
 CIT = re.compile(r"^ST (I|I-II|II-II|III|Suppl\.), q\.(\d+), a\.(\d+)$")
 ID = re.compile(r"^summa\.st\.(i|i-ii|ii-ii|iii|suppl)\.q(\d+)\.a(\d+)$")
@@ -189,9 +198,116 @@ def validate_bible() -> None:
               "(lossless-vs-source skipped: source cache absent)")
 
 
+def validate_vulgate() -> None:
+    files = sorted(glob.glob(os.path.join(VULGATE, "*.jsonl")))
+    if not files:
+        print("Clementine Vulgate: not ingested (skipped)")
+        return
+
+    # imported here so the earlier gates still run even if the Vulgate module changes
+    from vulgate import (EXPECTED_CHAPTERS, BOOKS, ALLOWED_NONASCII, clean_latin,
+                         CACHE as VG_CACHE, _VERSE as VG_LINE)  # noqa
+    slug_to_abbr = {slug: abbr for abbr, (slug, _lat) in BOOKS.items()}
+
+    ids: set[str] = set()
+    by_book: dict[str, dict[int, list[int]]] = {}
+    by_key: dict[str, str] = {}   # verse_key -> stored Latin, for the lossless check
+    total = 0
+
+    for path in files:
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            n = json.loads(line)
+            total += 1
+            nid = n["id"]
+            if nid in ids:
+                fail(f"duplicate id {nid}")
+            ids.add(nid)
+
+            if n.get("type") != "verse":
+                fail(f"non-verse node in Vulgate: {nid}")
+            if n.get("lang") != "la":
+                fail(f"non-Latin lang on Vulgate node: {nid}")
+            if not n.get("text", "").strip():
+                fail(f"empty verse text: {nid}")
+            src = n.get("source") or {}
+            if not src.get("license"):
+                fail(f"missing license: {nid}")
+
+            # no markup leaked; only the allowed Latin ligatures beyond ASCII
+            if any(c in n["text"] for c in "/\\[]<>"):
+                fail(f"markup leaked into Latin text: {nid}")
+            for c in n["text"]:
+                if ord(c) > 127 and c not in ALLOWED_NONASCII:
+                    fail(f"unexpected non-ASCII {c!r} (U+{ord(c):04X}) in {nid}")
+
+            slug = n["verse_key"].split("/")[0]
+            ch, v = n["chapter"], n["verse"]
+            if nid != f"vg.{slug}.{ch}.{v}":
+                fail(f"id/position mismatch: {nid}")
+            if n["verse_key"] != f"{slug}/{ch}/{v}":
+                fail(f"verse_key mismatch: {nid}")
+            if n["citation"] != f"{n['book']} {ch}:{v}":
+                fail(f"citation mismatch: {nid} vs {n['citation']}")
+
+            by_book.setdefault(slug, {}).setdefault(ch, []).append(v)
+            by_key[n["verse_key"]] = n["text"]
+
+    # completeness against the shared canon spec
+    for slug in EXPECTED_CHAPTERS:
+        if slug not in by_book:
+            fail(f"missing book: {slug}")
+    for slug in by_book:
+        if slug not in EXPECTED_CHAPTERS:
+            fail(f"unexpected book: {slug}")
+    for slug, expected in EXPECTED_CHAPTERS.items():
+        chapters = by_book[slug]
+        if max(chapters) != expected:
+            fail(f"{slug}: {max(chapters)} chapters, expected {expected}")
+        for ch in range(1, expected + 1):
+            vs = sorted(chapters.get(ch, []))
+            if not vs:
+                fail(f"{slug} ch.{ch}: no verses")
+            if len(vs) != len(set(vs)):
+                fail(f"{slug} ch.{ch}: duplicate verse numbers")
+            if vs[0] != 1 or vs != list(range(vs[0], vs[-1] + 1)):
+                fail(f"{slug} ch.{ch}: non-contiguous verses {vs[:5]}..{vs[-3:]}")
+
+    # lossless: re-parse the raw source cache with the SAME cleaner and require an
+    # exact match. Independent of the ingest run; proves the transform is the only
+    # thing between source and stored text. Needs the per-book source cache.
+    if os.path.isdir(VG_CACHE) and glob.glob(os.path.join(VG_CACHE, "*.lat")):
+        checked = 0
+        for slug, chapters in by_book.items():
+            abbr = slug_to_abbr[slug]
+            src = os.path.join(VG_CACHE, f"{abbr}.lat")
+            if not os.path.exists(src):
+                fail(f"source cache missing for {slug} ({abbr}.lat)")
+            raw = open(src, "rb").read().decode("cp1252")
+            src_by_key: dict[str, str] = {}
+            for ln in raw.splitlines():
+                m = VG_LINE.match(ln.rstrip())
+                if m:
+                    src_by_key[f"{slug}/{int(m.group(1))}/{int(m.group(2))}"] = clean_latin(m.group(3))
+            for ch, vs in chapters.items():
+                for v in vs:
+                    k = f"{slug}/{ch}/{v}"
+                    if by_key[k] != src_by_key.get(k):
+                        fail(f"lossless: verse {k} does not match source under the cleaner")
+                    checked += 1
+        print(f"Vulgate OK: {total} verses, {len(by_book)} books; "
+              f"lossless re-derived from source for {checked} verses")
+    else:
+        print(f"Vulgate OK: {total} verses, {len(by_book)} books "
+              "(lossless-vs-source skipped: source cache absent)")
+
+
 def main() -> None:
     validate_summa()
     validate_bible()
+    validate_vulgate()
     print("lossless, addressable, and complete for the ingested corpus.")
 
 

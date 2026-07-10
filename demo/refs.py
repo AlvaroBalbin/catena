@@ -20,7 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "ingest"))
 sys.path.insert(0, os.path.join(ROOT, "demo"))
 from scripture import normalize_ref  # noqa: E402
-from bible_text import verses_for  # noqa: E402
+from bible_text import verses_for, latin_for  # noqa: E402
 
 GRAPH = os.path.join(ROOT, "data", "graph")
 
@@ -38,12 +38,18 @@ def by_reference(query: str) -> None:
         raise SystemExit(f'could not parse a Scripture reference from "{query}"')
     key = norm["chapter_key"] if norm["verse_start"] is None else norm["verse_keys"][0]
 
-    # the verse text itself (Douay-Rheims), when the Bible has been ingested
+    # the verse text itself - Douay-Rheims English and, in parallel, the Clementine
+    # Vulgate Latin - when the Bibles have been ingested
     verses = verses_for(norm)
+    latin = latin_for(norm)
     if verses:
-        print(f'\n{norm["ref"]} (Douay-Rheims, verbatim, public domain):\n')
+        label = "Douay-Rheims + Clementine Vulgate" if latin else "Douay-Rheims"
+        print(f'\n{norm["ref"]} ({label}, verbatim, public domain):\n')
         for d in verses:
             print(f'  {d["citation"]}  {d["text"]}')
+            la = latin.get(f'{norm["slug"]}/{d["chapter"]}/{d["verse"]}')
+            if la:
+                print(f'  {" " * len(d["citation"])}  ({la})')
 
     index = _load("scripture_index.json")
     hits = index.get(key, [])

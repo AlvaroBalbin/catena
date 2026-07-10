@@ -25,8 +25,8 @@ The name is from the *Catena Aurea*, Aquinas's "golden chain" of sourced quotati
 |------|----------------------|--------|--------|
 | Summa Theologica | Fathers of the English Dominican Province, 2nd ed. 1920-22 | Public domain | in corpus (3,115 articles) |
 | Douay-Rheims Bible | Challoner revision (Project Gutenberg #1581) | Public domain | in corpus (35,786 verses, 73 books) |
+| Clementine Vulgate | Sixto-Clementine 1592 (Clementine Vulgate Project e-text) | Public domain | in corpus (35,809 verses, parallel Latin) |
 | Church Fathers | Schaff, Ante/Nicene/Post-Nicene Fathers, 1885-1900 | Public domain | roadmap |
-| Clementine Vulgate | 1592 | Public domain | roadmap |
 | Older encyclicals / councils | pre-1930 English translations | Public domain (verify per-doc) | roadmap |
 | Catechism of the Catholic Church | USCCB/LEV | **Copyright - permission track** | not redistributed; see SOURCES.md |
 
@@ -37,6 +37,7 @@ catena/
   data/
     SOURCES.md        # per-text rights map and provenance (READ THIS FIRST)
     summa/            # ingested corpus, one file per unit + a manifest
+    bible/            # drb/ (Douay-Rheims English) + vg/ (Clementine Vulgate Latin)
   docs/
     SCHEMA.md         # the corpus data model
     graph/            # the citation graph (verse -> articles, article -> refs, stats)
@@ -54,6 +55,7 @@ No install, no keys:
 ```bash
 python ingest/run.py --all      # build the Summa from source (one-time, ~10 min, polite)
 python ingest/bible.py          # add the Douay-Rheims Bible (35,786 verses, one fetch)
+python ingest/vulgate.py        # add the Clementine Vulgate Latin, in parallel (35,809 verses)
 python ingest/validate.py       # prove it: lossless, addressable, complete
 python demo/ask.py "is sacred doctrine a science"
 ```
@@ -132,23 +134,26 @@ queryable edges. Across the corpus:
 
 The `data/graph/` artifacts are open data in their own right.
 
-## The verse behind the citation
+## The verse behind the citation - in two languages
 
 The Scripture graph told you *which* articles lean on a verse. With the Douay-Rheims
-Bible in the corpus (the Challoner revision, the Bible whose Vulgate numbering the
-Summa's own citations use), those citations now resolve to the **actual verse text**,
-verbatim and cited:
+Bible in the corpus (the Challoner revision, whose Vulgate numbering the Summa's own
+citations use) **and the Clementine Vulgate** beside it, a citation now resolves to the
+**actual verse text** - the English *and* the Latin Aquinas actually quoted - verbatim
+and cited:
 
 ```bash
 python demo/refs.py "John 1:14"
 ```
 
 ```
-John 1:14 (Douay-Rheims, verbatim, public domain):
+John 1:14 (Douay-Rheims + Clementine Vulgate, verbatim, public domain):
 
   John 1:14  And the Word was made flesh and dwelt among us (and we saw his glory,
              the glory as it were of the only begotten of the Father), full of grace
              and truth.
+             (Et Verbum caro factum est, et habitavit in nobis : et vidimus gloriam
+              ejus, gloriam quasi unigeniti a Patre plenum gratiæ et veritatis.)
 
 23 article(s) lean on John 1:14 (verse):
   [ST I-II, q.108, a.1]  Whether the New Law ought to prescribe or prohibit any external acts?
@@ -156,16 +161,19 @@ John 1:14 (Douay-Rheims, verbatim, public domain):
   ...
 ```
 
-The Bible was ingested to the same three disciplines as the Summa: each of the 35,786
-verses is verbatim (lossless-verified against the source), addressable
-(`john/1/14`, the exact key the citation graph uses), and complete (all 73 books of the
-Catholic canon, every chapter, contiguous verse numbering, proven by the validator).
-Because it is the Douay-Rheims, its Vulgate psalm numbering lines up with the Summa's
-citations where a modern Bible would not - so **99.4%** of the Summa's Scripture
-citations resolve to real verse text (the small remainder are citations that reference a
-verse number the chapter does not have - garbled source citations, honestly left
-unresolved rather than forced). Provenance and the one naming seam (the Douay
-"1 Kings" = 1 Samuel convention) are documented in [`data/SOURCES.md`](data/SOURCES.md).
+Both Bibles were ingested to the same three disciplines as the Summa. Each of the
+35,786 Douay verses and 35,809 Clementine Vulgate verses is verbatim (lossless-verified
+against the source - the Latin is re-derived from the raw edition under one documented
+markup rule and must match exactly), addressable (`john/1/14`, the exact key the
+citation graph uses), and complete (all 73 books of the Catholic canon, every chapter,
+contiguous verse numbering, proven by the validator). Because both follow Vulgate
+numbering, they line up with the Summa's citations where a modern Bible would not - so
+**99.4%** of the Summa's Scripture citations resolve to English verse text and **99.5%**
+to Latin. The two Bibles parallel each other verse-for-verse across **99.9%** of
+addresses; the handful that do not meet are concentrated in the Psalms, where the two
+editions split a few verses differently - measured and recorded, never forced.
+Provenance, the markup rule, and the naming seams are documented in
+[`data/SOURCES.md`](data/SOURCES.md).
 
 ## Roadmap
 
@@ -189,11 +197,11 @@ claude mcp add catena -- python /absolute/path/to/catena/mcp/server.py
 ```
 
 Tools: `search` (grounded passages or a refusal), `get_article`, `lookup_verse`
-(now returns the verbatim Douay-Rheims verse text plus the articles that lean on it),
-`article_scripture`, `cross_references`. See [`mcp/README.md`](mcp/README.md).
-- **More public-domain texts** - Church Fathers (Schaff), the Clementine Vulgate
-  (parallel Latin), pre-1930 encyclicals and councils, each with a verified
-  `SOURCES.md` entry.
+(returns the verbatim Douay-Rheims English and the parallel Clementine Vulgate Latin,
+plus the articles that lean on the verse), `article_scripture`, `cross_references`.
+See [`mcp/README.md`](mcp/README.md).
+- **More public-domain texts** - Church Fathers (Schaff), pre-1930 encyclicals and
+  councils, each with a verified `SOURCES.md` entry.
 - **Catechism** - only if/when USCCB grants written permission (see
   [`docs/catechism-permission-request.md`](docs/catechism-permission-request.md)).
 

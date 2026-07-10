@@ -1,0 +1,625 @@
+{
+  "work": "clementine-vulgate",
+  "title": "Biblia Sacra juxta Vulgatam Clementinam",
+  "edition": "Sixto-Clementine Vulgate (1592)",
+  "electronic_edition": "The Clementine Vulgate Project (ed. Michael Tweedale, London, 2005)",
+  "language": "Latin",
+  "license": "public-domain",
+  "source": "https://raw.githubusercontent.com/jrichter/ClementineVulgateConverter/master/latin",
+  "via": "GitHub mirror jrichter/ClementineVulgateConverter/latin (project .lat files)",
+  "retrieved": "2026-07-09",
+  "structure": [
+    "testament",
+    "book",
+    "chapter",
+    "verse"
+  ],
+  "canon": "Catholic (73 books, incl. deuterocanonical)",
+  "numbering": "Vulgate numbering; keyed identically to the Douay-Rheims and the Summa's citations",
+  "scope": "verse text only, verbatim. The edition's typographic markup is removed by rule: poetic line breaks '/', paragraph marks '\\\\', poetic brackets '[ ]', and the Canticle's marginal speaker rubrics '<Sponsa>/<Sponsus>/<Chorus>' (editorial apparatus, not scripture). Latin ligatures (ae, oe, e-diaeresis) kept verbatim.",
+  "counts": {
+    "books": 73,
+    "chapters": 1334,
+    "verses": 35809
+  },
+  "parallel_coverage": {
+    "vulgate_verses": 35809,
+    "douay_verses": 35786,
+    "shared_keys": 35763,
+    "vulgate_only": 46,
+    "douay_only": 23,
+    "alignment_rate": 0.9994
+  },
+  "citation_graph_coverage": {
+    "cited_verse_keys": 4924,
+    "resolved_to_latin": 4897,
+    "rate": 0.9945
+  },
+  "coverage_note": "This Latin parallels the Douay-Rheims verse for verse across 99.9% of addresses. The handful that do not meet are concentrated in the Psalms, where this Clementine edition and the Gutenberg Douay-Rheims split a few verses (chiefly the psalm tituli) differently. Both are valid Vulgate numbering; nothing is missing, the addresses simply differ, and that gap is reported rather than papered over.",
+  "books": [
+    {
+      "slug": "genesis",
+      "book": "Genesis",
+      "latin_book": "Genesis",
+      "source_file": "Gn.lat",
+      "chapters": 50,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "exodus",
+      "book": "Exodus",
+      "latin_book": "Exodus",
+      "source_file": "Ex.lat",
+      "chapters": 40,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "leviticus",
+      "book": "Leviticus",
+      "latin_book": "Leviticus",
+      "source_file": "Lv.lat",
+      "chapters": 27,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "numbers",
+      "book": "Numbers",
+      "latin_book": "Numeri",
+      "source_file": "Nm.lat",
+      "chapters": 36,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "deuteronomy",
+      "book": "Deuteronomy",
+      "latin_book": "Deuteronomium",
+      "source_file": "Dt.lat",
+      "chapters": 34,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "joshua",
+      "book": "Joshua",
+      "latin_book": "Josue",
+      "source_file": "Jos.lat",
+      "chapters": 24,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "judges",
+      "book": "Judges",
+      "latin_book": "Judicum",
+      "source_file": "Jdc.lat",
+      "chapters": 21,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ruth",
+      "book": "Ruth",
+      "latin_book": "Ruth",
+      "source_file": "Rt.lat",
+      "chapters": 4,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-samuel",
+      "book": "1 Samuel",
+      "latin_book": "Regum I",
+      "source_file": "1Rg.lat",
+      "chapters": 31,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-samuel",
+      "book": "2 Samuel",
+      "latin_book": "Regum II",
+      "source_file": "2Rg.lat",
+      "chapters": 24,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-kings",
+      "book": "1 Kings",
+      "latin_book": "Regum III",
+      "source_file": "3Rg.lat",
+      "chapters": 22,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-kings",
+      "book": "2 Kings",
+      "latin_book": "Regum IV",
+      "source_file": "4Rg.lat",
+      "chapters": 25,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-chronicles",
+      "book": "1 Chronicles",
+      "latin_book": "Paralipomenon I",
+      "source_file": "1Par.lat",
+      "chapters": 29,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-chronicles",
+      "book": "2 Chronicles",
+      "latin_book": "Paralipomenon II",
+      "source_file": "2Par.lat",
+      "chapters": 36,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ezra",
+      "book": "Ezra",
+      "latin_book": "Esdrae",
+      "source_file": "Esr.lat",
+      "chapters": 10,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "nehemiah",
+      "book": "Nehemiah",
+      "latin_book": "Nehemiae",
+      "source_file": "Neh.lat",
+      "chapters": 13,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "tobit",
+      "book": "Tobit",
+      "latin_book": "Tobiae",
+      "source_file": "Tob.lat",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "judith",
+      "book": "Judith",
+      "latin_book": "Judith",
+      "source_file": "Jdt.lat",
+      "chapters": 16,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "esther",
+      "book": "Esther",
+      "latin_book": "Esther",
+      "source_file": "Est.lat",
+      "chapters": 16,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "job",
+      "book": "Job",
+      "latin_book": "Job",
+      "source_file": "Job.lat",
+      "chapters": 42,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "psalms",
+      "book": "Psalm",
+      "latin_book": "Psalmi",
+      "source_file": "Ps.lat",
+      "chapters": 150,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "proverbs",
+      "book": "Proverbs",
+      "latin_book": "Proverbia",
+      "source_file": "Pr.lat",
+      "chapters": 31,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ecclesiastes",
+      "book": "Ecclesiastes",
+      "latin_book": "Ecclesiastes",
+      "source_file": "Ecl.lat",
+      "chapters": 12,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "song-of-songs",
+      "book": "Song of Songs",
+      "latin_book": "Canticum Canticorum",
+      "source_file": "Ct.lat",
+      "chapters": 8,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "wisdom",
+      "book": "Wisdom",
+      "latin_book": "Sapientia",
+      "source_file": "Sap.lat",
+      "chapters": 19,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "sirach",
+      "book": "Sirach",
+      "latin_book": "Ecclesiasticus",
+      "source_file": "Sir.lat",
+      "chapters": 51,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "isaiah",
+      "book": "Isaiah",
+      "latin_book": "Isaias",
+      "source_file": "Is.lat",
+      "chapters": 66,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "jeremiah",
+      "book": "Jeremiah",
+      "latin_book": "Jeremias",
+      "source_file": "Jr.lat",
+      "chapters": 52,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "lamentations",
+      "book": "Lamentations",
+      "latin_book": "Lamentationes",
+      "source_file": "Lam.lat",
+      "chapters": 5,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "baruch",
+      "book": "Baruch",
+      "latin_book": "Baruch",
+      "source_file": "Bar.lat",
+      "chapters": 6,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "ezekiel",
+      "book": "Ezekiel",
+      "latin_book": "Ezechiel",
+      "source_file": "Ez.lat",
+      "chapters": 48,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "daniel",
+      "book": "Daniel",
+      "latin_book": "Daniel",
+      "source_file": "Dn.lat",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "hosea",
+      "book": "Hosea",
+      "latin_book": "Osee",
+      "source_file": "Os.lat",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "joel",
+      "book": "Joel",
+      "latin_book": "Joel",
+      "source_file": "Joel.lat",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "amos",
+      "book": "Amos",
+      "latin_book": "Amos",
+      "source_file": "Am.lat",
+      "chapters": 9,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "obadiah",
+      "book": "Obadiah",
+      "latin_book": "Abdias",
+      "source_file": "Abd.lat",
+      "chapters": 1,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "jonah",
+      "book": "Jonah",
+      "latin_book": "Jonas",
+      "source_file": "Jon.lat",
+      "chapters": 4,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "micah",
+      "book": "Micah",
+      "latin_book": "Michaeas",
+      "source_file": "Mch.lat",
+      "chapters": 7,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "nahum",
+      "book": "Nahum",
+      "latin_book": "Nahum",
+      "source_file": "Nah.lat",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "habakkuk",
+      "book": "Habakkuk",
+      "latin_book": "Habacuc",
+      "source_file": "Hab.lat",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "zephaniah",
+      "book": "Zephaniah",
+      "latin_book": "Sophonias",
+      "source_file": "Soph.lat",
+      "chapters": 3,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "haggai",
+      "book": "Haggai",
+      "latin_book": "Aggaeus",
+      "source_file": "Agg.lat",
+      "chapters": 2,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "zechariah",
+      "book": "Zechariah",
+      "latin_book": "Zacharias",
+      "source_file": "Zach.lat",
+      "chapters": 14,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "malachi",
+      "book": "Malachi",
+      "latin_book": "Malachias",
+      "source_file": "Mal.lat",
+      "chapters": 4,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "1-maccabees",
+      "book": "1 Maccabees",
+      "latin_book": "Machabaeorum I",
+      "source_file": "1Mcc.lat",
+      "chapters": 16,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "2-maccabees",
+      "book": "2 Maccabees",
+      "latin_book": "Machabaeorum II",
+      "source_file": "2Mcc.lat",
+      "chapters": 15,
+      "testament": "Old Testament"
+    },
+    {
+      "slug": "matthew",
+      "book": "Matthew",
+      "latin_book": "Matthaeus",
+      "source_file": "Mt.lat",
+      "chapters": 28,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "mark",
+      "book": "Mark",
+      "latin_book": "Marcus",
+      "source_file": "Mc.lat",
+      "chapters": 16,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "luke",
+      "book": "Luke",
+      "latin_book": "Lucas",
+      "source_file": "Lc.lat",
+      "chapters": 24,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "john",
+      "book": "John",
+      "latin_book": "Joannes",
+      "source_file": "Jo.lat",
+      "chapters": 21,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "acts",
+      "book": "Acts",
+      "latin_book": "Actus Apostolorum",
+      "source_file": "Act.lat",
+      "chapters": 28,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "romans",
+      "book": "Romans",
+      "latin_book": "ad Romanos",
+      "source_file": "Rom.lat",
+      "chapters": 16,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-corinthians",
+      "book": "1 Corinthians",
+      "latin_book": "ad Corinthios I",
+      "source_file": "1Cor.lat",
+      "chapters": 16,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-corinthians",
+      "book": "2 Corinthians",
+      "latin_book": "ad Corinthios II",
+      "source_file": "2Cor.lat",
+      "chapters": 13,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "galatians",
+      "book": "Galatians",
+      "latin_book": "ad Galatas",
+      "source_file": "Gal.lat",
+      "chapters": 6,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "ephesians",
+      "book": "Ephesians",
+      "latin_book": "ad Ephesios",
+      "source_file": "Eph.lat",
+      "chapters": 6,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "philippians",
+      "book": "Philippians",
+      "latin_book": "ad Philippenses",
+      "source_file": "Phlp.lat",
+      "chapters": 4,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "colossians",
+      "book": "Colossians",
+      "latin_book": "ad Colossenses",
+      "source_file": "Col.lat",
+      "chapters": 4,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-thessalonians",
+      "book": "1 Thessalonians",
+      "latin_book": "ad Thessalonicenses I",
+      "source_file": "1Thes.lat",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-thessalonians",
+      "book": "2 Thessalonians",
+      "latin_book": "ad Thessalonicenses II",
+      "source_file": "2Thes.lat",
+      "chapters": 3,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-timothy",
+      "book": "1 Timothy",
+      "latin_book": "ad Timotheum I",
+      "source_file": "1Tim.lat",
+      "chapters": 6,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-timothy",
+      "book": "2 Timothy",
+      "latin_book": "ad Timotheum II",
+      "source_file": "2Tim.lat",
+      "chapters": 4,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "titus",
+      "book": "Titus",
+      "latin_book": "ad Titum",
+      "source_file": "Tit.lat",
+      "chapters": 3,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "philemon",
+      "book": "Philemon",
+      "latin_book": "ad Philemonem",
+      "source_file": "Phlm.lat",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "hebrews",
+      "book": "Hebrews",
+      "latin_book": "ad Hebraeos",
+      "source_file": "Hbr.lat",
+      "chapters": 13,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "james",
+      "book": "James",
+      "latin_book": "Jacobi",
+      "source_file": "Jac.lat",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-peter",
+      "book": "1 Peter",
+      "latin_book": "Petri I",
+      "source_file": "1Ptr.lat",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-peter",
+      "book": "2 Peter",
+      "latin_book": "Petri II",
+      "source_file": "2Ptr.lat",
+      "chapters": 3,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "1-john",
+      "book": "1 John",
+      "latin_book": "Joannis I",
+      "source_file": "1Jo.lat",
+      "chapters": 5,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "2-john",
+      "book": "2 John",
+      "latin_book": "Joannis II",
+      "source_file": "2Jo.lat",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "3-john",
+      "book": "3 John",
+      "latin_book": "Joannis III",
+      "source_file": "3Jo.lat",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "jude",
+      "book": "Jude",
+      "latin_book": "Judae",
+      "source_file": "Jud.lat",
+      "chapters": 1,
+      "testament": "New Testament"
+    },
+    {
+      "slug": "revelation",
+      "book": "Revelation",
+      "latin_book": "Apocalypsis",
+      "source_file": "Apc.lat",
+      "chapters": 22,
+      "testament": "New Testament"
+    }
+  ]
+}
