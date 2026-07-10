@@ -7,105 +7,105 @@
 <meta name="description" content="Ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the golden chain of Scripture behind them, in English and the Latin Vulgate. It cites its sources or it refuses - it never invents.">
 <style>
   :root{
-    --paper:#f6f2e9; --ink:#262019; --muted:#6d6455; --line:#e0d8c6;
-    --gold:#9a7b1f; --gold-soft:#b89a4e; --card:#fbf8f1; --accent-bg:#efe8d6;
-    --refuse:#8a5a2b;
-  }
-  @media (prefers-color-scheme:dark){
-    :root{
-      --paper:#16140f; --ink:#eae4d6; --muted:#9c927e; --line:#2c281f;
-      --gold:#d9b45f; --gold-soft:#b9974a; --card:#1e1b14; --accent-bg:#241f16;
-      --refuse:#d3a05e;
-    }
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1b1d21; --muted:#656b76; --line:#e7e9ef;
+    --accent:#6366f1; --accent-strong:#4f46e5; --accent-soft:#eef0fe;
+    --amber:#b45309; --amber-bg:#fef6ec; --amber-line:#f2dcbf;
+    --sh:0 1px 2px rgba(16,24,40,.05); --sh-h:0 8px 24px rgba(16,24,40,.10);
+    --r:14px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--paper);color:var(--ink)}
-  body{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
        line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
   a{color:inherit;text-decoration:none}
-  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
-  .ui{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px}
+  .ui{font-family:inherit}
 
-  header{padding:34px 0 10px;border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-  .brand h1{font-size:34px;margin:0;letter-spacing:.5px;font-weight:600}
-  .brand .chain{color:var(--gold);font-size:22px;letter-spacing:2px}
-  .tag{color:var(--muted);font-size:15px;margin:8px 0 0}
-  .stats{margin:14px 0 2px;color:var(--muted);font-size:13px;display:flex;gap:6px 18px;flex-wrap:wrap}
-  .stats b{color:var(--ink);font-weight:600}
+  header{padding:44px 0 6px}
+  .brand h1{font-size:42px;margin:0;font-weight:800;letter-spacing:-.025em;
+     background:linear-gradient(95deg,var(--accent-strong),#8b5cf6);
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  .tag{color:var(--muted);font-size:15.5px;margin:12px 0 0;max-width:600px;line-height:1.55}
+  .stats{margin:18px 0 2px;font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap}
+  .stats span{background:var(--card);border:1px solid var(--line);border-radius:999px;
+     padding:5px 13px;box-shadow:var(--sh);color:var(--muted)}
+  .stats b{color:var(--ink);font-weight:700}
 
-  form.search{position:sticky;top:0;z-index:5;background:var(--paper);
-       padding:18px 0 16px;border-bottom:1px solid var(--line)}
-  .searchbar{display:flex;gap:8px}
-  #q{flex:1;font-size:18px;padding:13px 15px;border:1px solid var(--line);
-     background:var(--card);color:var(--ink);border-radius:10px;font-family:inherit;outline:none}
-  #q:focus{border-color:var(--gold-soft);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 18%,transparent)}
-  button.go{font-family:inherit;font-size:17px;padding:0 20px;border:1px solid var(--gold);
-     background:var(--gold);color:#1a1508;border-radius:10px;cursor:pointer}
-  button.go:disabled{opacity:.5;cursor:default}
-  .hint{color:var(--muted);font-size:12.5px;margin-top:8px}
+  form.search{position:sticky;top:0;z-index:5;
+       background:linear-gradient(var(--bg) 78%,transparent);padding:16px 0 16px}
+  .searchbar{display:flex;gap:10px}
+  #q{flex:1;font-size:16.5px;padding:15px 20px;border:1px solid var(--line);
+     background:var(--card);color:var(--ink);border-radius:999px;font-family:inherit;outline:none;box-shadow:var(--sh)}
+  #q::placeholder{color:#9aa0ab}
+  #q:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  button.go{font-family:inherit;font-size:16px;font-weight:600;padding:0 28px;border:0;
+     background:var(--accent);color:#fff;border-radius:999px;cursor:pointer;box-shadow:var(--sh)}
+  button.go:hover{background:var(--accent-strong)}
+  button.go:disabled{opacity:.45;cursor:default}
+  .hint{color:var(--muted);font-size:12.5px;margin-top:11px;text-align:center}
 
-  main{padding:26px 0 80px;min-height:50vh}
-  .section-title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;
-     color:var(--gold);margin:30px 0 12px;font-family:-apple-system,system-ui,sans-serif;font-weight:600}
-  .section-title:first-child{margin-top:6px}
+  main{padding:12px 0 90px;min-height:50vh}
+  .section-title{font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+     color:var(--accent-strong);margin:32px 0 13px;font-weight:700}
+  .section-title:first-child{margin-top:4px}
 
-  .row{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
-     background:var(--card);margin-bottom:10px;cursor:pointer;transition:border-color .12s,transform .12s}
-  .row:hover{border-color:var(--gold-soft)}
-  .cite{font-family:-apple-system,system-ui,sans-serif;font-size:12.5px;color:var(--gold);
-     font-weight:600;letter-spacing:.02em}
-  .row .title{font-size:17px;margin:3px 0 0}
-  .row .snip{color:var(--muted);font-size:14.5px;margin-top:6px}
-  .row .deg{float:right;color:var(--muted);font-size:12px;font-family:system-ui,sans-serif}
+  .row{display:block;padding:16px 18px;border:1px solid var(--line);border-radius:var(--r);
+     background:var(--card);margin-bottom:12px;cursor:pointer;box-shadow:var(--sh);
+     transition:box-shadow .15s,transform .15s,border-color .15s}
+  .row:hover{box-shadow:var(--sh-h);transform:translateY(-1px);border-color:#d9dce4}
+  .cite{font-size:12.5px;color:var(--accent-strong);font-weight:700;letter-spacing:.01em}
+  .row .title{font-size:17px;margin:4px 0 0;font-weight:600}
+  .row .snip{color:var(--muted);font-size:14.5px;margin-top:8px;line-height:1.5}
+  .row .deg{float:right;color:var(--muted);font-size:12px;font-weight:500}
 
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{font-family:-apple-system,system-ui,sans-serif;font-size:13.5px;padding:7px 12px;border-radius:999px;
-     border:1px solid var(--line);background:var(--accent-bg);cursor:pointer;color:var(--ink)}
-  .chip:hover{border-color:var(--gold-soft)}
-  .chip .ct{color:var(--muted);margin-left:6px;font-size:12px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{font-size:13.5px;padding:8px 14px;border-radius:999px;border:1px solid transparent;
+     background:var(--accent-soft);cursor:pointer;color:var(--accent-strong);font-weight:500;transition:background .12s}
+  .chip:hover{background:#e2e5fd}
+  .chip .ct{color:var(--muted);margin-left:7px;font-size:12px;font-weight:600}
 
-  .article{max-width:760px}
-  .article h2{font-size:25px;margin:2px 0 4px;font-weight:600;line-height:1.3}
-  .article .body{font-size:18px;white-space:pre-wrap;margin-top:14px}
-  .back{color:var(--muted);font-size:13.5px;cursor:pointer;font-family:system-ui,sans-serif;
-     display:inline-flex;gap:6px;align-items:center;margin-bottom:6px}
-  .back:hover{color:var(--gold)}
+  .article{max-width:720px}
+  .article h2{font-size:26px;margin:4px 0 2px;font-weight:700;line-height:1.28;letter-spacing:-.01em}
+  .article .body{font-family:Georgia,"Times New Roman",serif;font-size:18.5px;line-height:1.72;
+     white-space:pre-wrap;margin-top:16px}
+  .back{color:var(--muted);font-size:14px;cursor:pointer;display:inline-flex;gap:6px;
+     align-items:center;margin-bottom:10px;font-weight:500}
+  .back:hover{color:var(--accent-strong)}
 
-  .chain{margin:26px 0 0;border-top:1px solid var(--line);padding-top:8px}
-  .chain h3{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);
-     font-family:system-ui,sans-serif;margin:18px 0 8px;font-weight:600}
-  .link{display:inline-block;padding:5px 10px;margin:0 6px 6px 0;border:1px solid var(--line);
-     border-radius:8px;cursor:pointer;font-size:14px;background:var(--card)}
-  .link:hover{border-color:var(--gold-soft)}
-  .link .lc{color:var(--gold);font-family:system-ui,sans-serif;font-size:12px;font-weight:600}
+  .chain{margin:30px 0 0;border-top:1px solid var(--line);padding-top:6px}
+  .chain h3{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent-strong);
+     margin:22px 0 10px;font-weight:700}
+  .link{display:inline-block;padding:7px 12px;margin:0 8px 8px 0;border:1px solid var(--line);
+     border-radius:10px;cursor:pointer;font-size:14px;background:var(--card);box-shadow:var(--sh);
+     transition:box-shadow .12s,transform .12s}
+  .link:hover{box-shadow:var(--sh-h);transform:translateY(-1px)}
+  .link .lc{color:var(--accent-strong);font-size:12px;font-weight:700}
 
-  .verse{border-left:3px solid var(--gold);padding:4px 0 4px 16px;margin:14px 0}
-  .verse .en{font-size:18px}
-  .verse .la{font-size:16px;font-style:italic;color:var(--muted);margin-top:7px}
-  .verse .la .vg{font-style:normal;font-family:system-ui,sans-serif;font-size:10.5px;letter-spacing:.1em;
-     text-transform:uppercase;color:var(--gold-soft);margin-right:8px;vertical-align:1px}
-  .vref{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--gold);font-weight:600}
+  .verse{border-left:3px solid var(--accent);background:var(--card);border-radius:0 12px 12px 0;
+     padding:14px 18px;margin:16px 0;box-shadow:var(--sh)}
+  .verse .en{font-size:18px;line-height:1.6}
+  .verse .la{font-size:16px;font-style:italic;color:var(--muted);margin-top:9px;font-family:Georgia,serif}
+  .verse .la .vg{font-style:normal;font-family:inherit;font-size:10px;letter-spacing:.08em;font-weight:700;
+     text-transform:uppercase;color:var(--accent);margin-right:9px;vertical-align:1px}
+  .vref{font-size:12.5px;color:var(--accent-strong);font-weight:700;margin-bottom:6px}
 
-  .refuse{border:1px dashed var(--refuse);border-radius:10px;padding:18px 18px;color:var(--refuse);
-     background:color-mix(in srgb,var(--refuse) 7%,transparent)}
-  .refuse b{display:block;margin-bottom:5px;font-size:16px}
-  .note{color:var(--muted);font-size:14px;margin:10px 0}
-  .loading{color:var(--muted);font-size:14px;font-family:system-ui,sans-serif}
-  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:13px}
-  footer a{color:var(--gold);border-bottom:1px solid transparent}
-  footer a:hover{border-color:var(--gold-soft)}
-  .spin{display:inline-block;width:11px;height:11px;border:2px solid var(--line);
-     border-top-color:var(--gold);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-1px;margin-right:7px}
+  .refuse{border:1px solid var(--amber-line);border-radius:var(--r);padding:20px;
+     color:var(--amber);background:var(--amber-bg);box-shadow:var(--sh)}
+  .refuse b{display:block;margin-bottom:6px;font-size:16px;color:#92400e}
+  .note{color:var(--muted);font-size:14px;margin:12px 0}
+  .loading{color:var(--muted);font-size:14px}
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;color:var(--muted);font-size:13px;line-height:1.6}
+  footer a{color:var(--accent-strong);font-weight:600}
+  footer a:hover{text-decoration:underline}
+  .spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);
+     border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:8px}
   @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <div class="brand">
-      <h1>Catena</h1><span class="chain">&#9741; &#9741; &#9741;</span>
-    </div>
+    <div class="brand"><h1>Catena</h1></div>
     <p class="tag">Ask the Catholic tradition. Read the actual passages Aquinas wrote,
        verbatim and cited, and walk the chain of Scripture behind them - in English and
        the Latin Vulgate. It cites its sources, or it refuses. It never invents.</p>
