@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catena - ask the Catholic tradition, cited or refused</title>
-<meta name="description" content="Ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the golden chain of Scripture behind them, in English and the Latin Vulgate. It cites its sources or it refuses - it never invents.">
+<meta name="description" content="Ask a question and read the actual passages Aquinas wrote and the Church Fathers he chained together in the Catena Aurea, verbatim and cited; walk the Scripture behind them, in English and the Latin Vulgate. It cites its sources or it refuses - it never invents.">
 <style>
   :root{
     --paper:#fcfbf8; --ink:#1c1917; --muted:#756d61; --rubric:#9c2f26;
@@ -95,6 +95,18 @@
      text-transform:uppercase;color:var(--rubric);margin-right:10px;vertical-align:1px}
   .vref{font-family:var(--mono);font-size:12px;color:var(--rubric);margin-bottom:7px;letter-spacing:.01em}
 
+  /* the golden chain: the Gospel lemma, then Father-attributed fragments glossed
+     like the apparatus - the Father's name rubricated in the margin, his words set */
+  .lemma{border-left:2px solid var(--rubric);padding:2px 0 2px 20px;margin:16px 0 8px}
+  .lemma .en{font-family:var(--serif);font-size:19px;line-height:1.6}
+  .fathers{margin-top:4px}
+  .father{display:grid;grid-template-columns:132px 1fr;column-gap:26px;
+     padding:16px 0;border-top:1px solid var(--rule)}
+  .father:first-child{border-top:0}
+  .father .fname{grid-column:1;font-family:var(--mono);font-size:12px;color:var(--rubric);
+     letter-spacing:.02em;padding-top:5px;line-height:1.35}
+  .father .ftext{grid-column:2;font-family:var(--serif);font-size:18px;line-height:1.66}
+
   /* an editorial note, not an alert */
   .refuse{border-left:2px solid var(--rubric);padding:4px 0 4px 20px;color:var(--ink);font-size:17px;line-height:1.55}
   .refuse b{display:block;margin-bottom:5px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
@@ -114,6 +126,8 @@
     .row{grid-template-columns:1fr;row-gap:4px}
     .cite,.row .title,.row .snip,.row .deg{grid-column:1}
     .cite{grid-row:auto} .row .title{grid-row:auto} .row .snip{grid-row:auto} .row .deg{grid-row:auto;margin-top:2px}
+    .father{grid-template-columns:1fr;row-gap:3px}
+    .father .fname{padding-top:0}
     .brand h1{font-size:29px;letter-spacing:.12em}
   }
 </style>
@@ -122,9 +136,9 @@
 <header>
   <div class="wrap">
     <div class="brand"><h1>Catena</h1></div>
-    <p class="tag">Ask the Catholic tradition. Read the actual passages Aquinas wrote,
-       verbatim and cited, and walk the chain of Scripture behind them - in English and
-       the Latin Vulgate. It cites its sources, or it refuses. It never invents.</p>
+    <p class="tag">Ask the Catholic tradition. Read the actual passages Aquinas wrote and the
+       Church Fathers he chained together, verbatim and cited, and walk the Scripture behind
+       them - in English and the Latin Vulgate. It cites its sources, or it refuses. It never invents.</p>
     <div class="stats ui" id="stats"></div>
   </div>
 </header>
@@ -144,8 +158,9 @@
 <main><div class="wrap" id="view"></div></main>
 
 <footer><div class="wrap ui">
-  Catena is an open, public-domain corpus: the Summa Theologica, the Douay-Rheims Bible,
-  and the Clementine Vulgate, with a citation graph and a cite-or-refuse retrieval demo.
+  Catena is an open, public-domain corpus: the Summa Theologica, the Catena Aurea (Aquinas's
+  patristic commentary on the Gospels), the Douay-Rheims Bible, and the Clementine Vulgate,
+  with a citation graph and a cite-or-refuse retrieval demo.
   This page runs entirely in your browser over that open data - nothing you type leaves it.
   &nbsp;<a href="https://github.com/AlvaroBalbin/catena" target="_blank" rel="noopener">Source &amp; data on GitHub &#8599;</a>
 </div></footer>
@@ -156,7 +171,7 @@ const $ = s => document.querySelector(s);
 const view = $("#view"), qEl = $("#q"), goEl = $("#go");
 const esc = s => (s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-let CORE=null, BODIES=null, INDEX=null;
+let CORE=null, BODIES=null, INDEX=null, CATENA=null;
 
 // ---- BM25, a faithful port of demo/retriever.py (same stopwords + thresholds) ----
 const STOP = new Set(("the a an and or but of to in on for with as is are was were be been being "+
@@ -236,11 +251,19 @@ function renderLanding(){
     `<span class="chip" data-go="#/v/${v.key}">${esc(titleRef(v.ref))}<span class="ct">${v.count}</span></span>`).join("");
   const books=(s.most_cited_books||[]).slice(0,10).map(b=>
     `<span class="chip">${esc(b[0])}<span class="ct">${b[1]}</span></span>`).join("");
+  const glossed=(s.most_glossed_verses||[]).slice(0,12).map(v=>
+    `<span class="chip" data-go="#/v/${v.key}">${esc(titleRef(v.ref))}<span class="ct">${v.count}</span></span>`).join("");
   const examples=["is God good","does man have free will","is it lawful to kill in self-defense",
     "John 1:14","whether happiness consists in wealth","ST I, q.2, a.3","Romans 5"]
     .map(e=>`<span class="chip" data-ask="${esc(e)}">${esc(e)}</span>`).join("");
+  const goldenChain = glossed ? `
+    <div class="section-title">The Fathers' golden chain</div>
+    <div class="note">Aquinas's <i>Catena Aurea</i> - the Church Fathers, verse by verse, on the four
+      Gospels. The verses they weigh in on most heavily, by how many Fathers speak.</div>
+    <div class="chips">${glossed}</div>` : "";
   view.innerHTML = `
     <div class="section-title">Try asking</div><div class="chips">${examples}</div>
+    ${goldenChain}
     <div class="section-title">The load-bearing arguments of the Summa</div>
     <div class="note">By how many other articles cite them - the structural backbone, made visible.</div>
     ${arts}
@@ -327,11 +350,55 @@ function renderVerse(key){
   } else {
     head = verseBlock(key) || `<div class="note">This verse is not among those the Summa cites, so its text is not in this bundle.</div>`;
   }
+  // the Fathers' golden chain on this verse (Catena Aurea), before the Summa apparatus
+  const fathers = (CORE.fathers_index||{})[key] || [];
+  const fathersHtml = fathers.length
+    ? `<div class="section-title">The Fathers on this verse</div>`+
+      fathers.map(f=>`<a class="row" href="#/c/${encodeURIComponent(f.id)}">
+        <div class="cite">Catena Aurea</div>
+        <div class="title">Aquinas's golden chain</div>
+        <div class="snip">${esc(f.father_summary||"")}</div></a>`).join("")
+    : "";
   const artHtml = arts.length
     ? `<div class="section-title">${arts.length} article(s) lean on this ${isChapter?"chapter":"verse"}</div>`+
       arts.map(a=>articleRow(a.id)).join("")
-    : `<div class="note">No Summa article cites this ${isChapter?"chapter":"verse"}.</div>`;
-  view.innerHTML = `<div class="back" data-back>&#8592; back</div>`+head+artHtml;
+    : (fathers.length ? "" : `<div class="note">No Summa article cites this ${isChapter?"chapter":"verse"}.</div>`);
+  view.innerHTML = `<div class="back" data-back>&#8592; back</div>`+head+fathersHtml+artHtml;
+  scrollTo(0,0);
+}
+
+// The Catena Aurea passage: the Gospel lemma, then each Father's fragment in the order
+// Aquinas chained them, then the Scripture the Fathers themselves reach back to.
+async function renderCatena(id){
+  if(!CATENA){
+    view.innerHTML=`<div class="loading"><span class="spin"></span>loading the golden chain...</div>`;
+    try{ CATENA = await (await fetch("data/catena.json")).json(); }
+    catch(e){ view.innerHTML=`<div class="note">Could not load the Catena Aurea bundle.</div>`; return; }
+  }
+  const n=CATENA[id];
+  if(!n){ view.innerHTML=`<div class="note">Unknown passage.</div>`; return; }
+  const ref = n.cit.replace(/^Catena Aurea,\s*/,"");
+  const vkey = (()=>{ const p=parseRef(ref); return p?p.key:null; })();
+  const lemma = n.lemma
+    ? `<div class="lemma"><div class="vref">${esc(ref)}</div><div class="en">${esc(n.lemma)}</div></div>`
+    : "";
+  const chain = n.segs.map(([father,text])=>`<div class="father">
+      <div class="fname">${esc(father)}</div><div class="ftext">${esc(text)}</div></div>`).join("");
+  const refs = (n.refs||[]);
+  const refsHtml = refs.length ? refs.map(r=>{ const k=refToKey(r);
+      return k ? `<span class="link" data-go="#/v/${k}"><span class="lc">verse</span> ${esc(r)}</span>`
+               : `<span class="link">${esc(r)}</span>`; }).join("") : "";
+  const chainSection = refsHtml
+    ? `<div class="chain"><h3>Scripture the Fathers reach back to</h3>${refsHtml}</div>` : "";
+  view.innerHTML = `<div class="article">
+    <div class="back" data-back>&#8592; back</div>
+    <div class="cite">Catena Aurea &middot; St. Thomas Aquinas</div>
+    <h2>${esc(ref)}</h2>
+    ${lemma}
+    ${vkey?`<div class="hint ui" style="margin:2px 0 22px">
+       <span class="link" data-go="#/v/${vkey}" style="border:0">Read the verse in English and the Latin Vulgate &#8594;</span></div>`:""}
+    <div class="fathers">${chain}</div>
+    ${chainSection}</div>`;
   scrollTo(0,0);
 }
 
@@ -357,6 +424,7 @@ function route(){
   if(!CORE) return;
   const h=location.hash.replace(/^#\/?/,"");
   if(h.startsWith("a/"))      return renderArticle(decodeURIComponent(h.slice(2)));
+  if(h.startsWith("c/"))      return renderCatena(decodeURIComponent(h.slice(2)));
   if(h.startsWith("v/"))      return renderVerse(h.slice(2));
   if(h.startsWith("s/")){ const q=decodeURIComponent(h.slice(2)); qEl.value=q;
      return INDEX ? renderSearch(q) : (view.innerHTML=`<div class="loading"><span class="spin"></span>indexing the Summa...</div>`); }
@@ -375,8 +443,8 @@ async function boot(){
   const m=CORE.meta;
   $("#stats").innerHTML =
     `<span><b>${fmt(m.articles)}</b> Summa articles</span>
+     <span><b>${fmt(m.catena_pericopes)}</b> Catena Aurea sections &middot; ${fmt(m.catena_fathers)} Fathers</span>
      <span><b>${fmt(m.scripture_edges)}</b> Scripture links</span>
-     <span><b>${fmt(m.internal_edges)}</b> cross-references</span>
      <span><b>${fmt(m.verses_en)}</b> verses &middot; Douay-Rheims + Vulgate</span>`;
   route();                                   // landing + verse/citation work from core
   qEl.disabled=false; goEl.disabled=false; qEl.placeholder="Ask a question, a reference, or a citation...";

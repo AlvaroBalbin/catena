@@ -126,13 +126,17 @@ class Index:
 
 
 def load_index() -> Index:
-    """Build the lexical index over passage-level nodes (Summa articles now, patristic
-    sections later). Individual Bible VERSES are deliberately excluded: they are far
-    too short and numerous for this BM25 floor (they skew avgdl and the document-
-    frequency thresholds the refusal logic depends on), and they are already reachable
-    verbatim through verse resolution (lookup_verse / demo/refs) and, later, the
-    semantic index. So the demo stays a grounded search over prose, and refusal stays
-    calibrated."""
+    """Build the lexical index over Summa articles. Two node types are deliberately
+    excluded because they de-calibrate this single BM25 floor (they shift avgdl and the
+    document-frequency thresholds the refusal logic depends on), and both are already
+    reachable verbatim by other means:
+      - Bible VERSES: too short and numerous; reached via verse resolution (lookup_verse).
+      - Catena Aurea patristic sections (type "father-comment"): 814 long pericopes whose
+        vocabulary widens df enough to tip out-of-domain queries past the coverage floor
+        (e.g. the lone word "car" defeating a refusal). They are reached structurally,
+        verse-keyed, through the golden chain (data/graph/fathers_index.json) rather than
+        blended here. A dedicated, separately-calibrated patristic index is future work.
+    So the demo stays a grounded search over prose, and refusal stays calibrated."""
     idx = Index()
     files = sorted(glob.glob(os.path.join(CORPUS, "**", "*.jsonl"), recursive=True))
     if not files:
@@ -143,7 +147,7 @@ def load_index() -> Index:
             if not line:
                 continue
             n = json.loads(line)
-            if n.get("type") == "verse":
+            if n.get("type") in ("verse", "father-comment"):
                 continue
             idx.add(Doc(n["id"], n["citation"], n.get("title", ""), n["text"], n.get("source", {})))
     idx.finalize()

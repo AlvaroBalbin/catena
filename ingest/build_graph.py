@@ -25,6 +25,7 @@ from crossref import parse_internal_refs
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SUMMA = os.path.join(ROOT, "data", "summa")
+CATENA = os.path.join(ROOT, "data", "catena")
 OUT = os.path.join(ROOT, "data", "graph")
 
 
@@ -157,6 +158,75 @@ def main() -> None:
           f"({internal_resolved}/{internal_total} refs resolved to real articles)")
     mca = stats["most_cited_articles"][:3]
     print("most-cited articles:", ", ".join(f"{a['citation']}({a['in_degree']})" for a in mca))
+
+    build_catena_graph()
+
+
+def build_catena_graph() -> None:
+    """Emit the golden-chain graph for the Catena Aurea, kept in SEPARATE files so
+    the Summa's scripture_index.json (which test_graph.py asserts is Summa-only) is
+    never touched:
+
+      fathers_index.json          Gospel verse key -> [ {catena id, citation,
+                                  father_summary, work} ] : from a verse, every
+                                  pericope whose Fathers comment on it.
+      catena_scripture_edges.json catena id -> [ normalized cross-ref strings ] :
+                                  the Scripture the Fathers cite inside a pericope.
+    """
+    files = sorted(glob.glob(os.path.join(CATENA, "*.jsonl")))
+    if not files:
+        print("Catena: not ingested (graph skipped)")
+        return
+
+    nodes = []
+    for f in files:
+        for line in open(f, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                nodes.append(json.loads(line))
+
+    fathers_index: dict[str, list] = defaultdict(list)
+    scripture_edges: dict[str, list] = {}
+    edge_total = 0
+
+    for n in nodes:
+        # distinct Fathers in this pericope, in first-appearance order
+        fathers = list(dict.fromkeys(s["father"] for s in n.get("segments", [])))
+        father_summary = ", ".join(fathers)
+        entry = {
+            "id": n["id"],
+            "citation": n["citation"],
+            "father_summary": father_summary,
+            "work": "catena-aurea",
+        }
+        for vk in n.get("commented_verse_keys", []):
+            fathers_index[vk].append(entry)
+
+        refs = []
+        seen: set[str] = set()
+        for c in n.get("citations_out", []):
+            if c.get("kind") != "scripture":
+                continue
+            norm = normalize_ref(c["raw"])
+            ref = norm["ref"] if norm else c["raw"]
+            if ref in seen:
+                continue
+            seen.add(ref)
+            refs.append(ref)
+        if refs:
+            scripture_edges[n["id"]] = refs
+            edge_total += len(refs)
+
+    fathers_index_sorted = {k: fathers_index[k] for k in sorted(fathers_index)}
+    scripture_edges_sorted = {k: scripture_edges[k] for k in sorted(scripture_edges)}
+
+    with open(os.path.join(OUT, "fathers_index.json"), "w", encoding="utf-8") as fh:
+        json.dump(fathers_index_sorted, fh, ensure_ascii=False, indent=0)
+    with open(os.path.join(OUT, "catena_scripture_edges.json"), "w", encoding="utf-8") as fh:
+        json.dump(scripture_edges_sorted, fh, ensure_ascii=False, indent=0)
+
+    print(f"catena: {len(nodes)} pericopes, {len(fathers_index_sorted)} commented "
+          f"verse keys indexed, {edge_total} Father scripture cross-ref edges")
 
 
 if __name__ == "__main__":

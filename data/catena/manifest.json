@@ -1,0 +1,56 @@
+{
+  "work": "catena-aurea",
+  "title": "Catena Aurea",
+  "author": "Thomas Aquinas",
+  "edition": "Catena Aurea (Oxford, 1841-45), tr. J. H. Newman",
+  "translator": "John Henry Newman",
+  "license": "public-domain",
+  "source": "https://www.ecatholic2000.com/catena/",
+  "retrieved": "2026-07-10",
+  "structure": [
+    "work",
+    "gospel",
+    "chapter",
+    "pericope"
+  ],
+  "gospels": [
+    {
+      "slug": "matthew",
+      "book": "Matthew",
+      "chapters": 28,
+      "pericopes": 278,
+      "fathers": 37,
+      "file": "data/catena/matthew.jsonl"
+    },
+    {
+      "slug": "mark",
+      "book": "Mark",
+      "chapters": 16,
+      "pericopes": 104,
+      "fathers": 19,
+      "file": "data/catena/mark.jsonl"
+    },
+    {
+      "slug": "luke",
+      "book": "Luke",
+      "chapters": 24,
+      "pericopes": 245,
+      "fathers": 28,
+      "file": "data/catena/luke.jsonl"
+    },
+    {
+      "slug": "john",
+      "book": "John",
+      "chapters": 21,
+      "pericopes": 187,
+      "fathers": 17,
+      "file": "data/catena/john.jsonl"
+    }
+  ],
+  "totals": {
+    "pericopes": 814,
+    "fragments": 12692,
+    "distinct_fathers": 51,
+    "commented_verses": 3766
+  }
+}

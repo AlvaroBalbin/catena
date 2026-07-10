@@ -60,6 +60,19 @@ def load_verse_text(subdir: str) -> dict[str, str]:
     return out
 
 
+def load_catena() -> list[dict]:
+    """The Catena Aurea pericopes (Aquinas's patristic golden chain on the 4 Gospels).
+    Each node is one verse-pericope carrying an ordered list of Father-attributed
+    fragments; keyed to Gospel verses via commented_verse_keys."""
+    out = []
+    for f in sorted(glob.glob(os.path.join(DATA, "catena", "*.jsonl"))):
+        for line in open(f, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                out.append(json.loads(line))
+    return out
+
+
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     arts = load_articles()
@@ -84,6 +97,39 @@ def main() -> None:
     book_slugs = {alias: slug for alias, (_name, slug) in _BOOK_LOOKUP.items()}
     slug_names = {slug: name for _alias, (name, slug) in _BOOK_LOOKUP.items()}
 
+    # --- Catena Aurea: the patristic golden chain, verse-keyed ---------------------
+    # fathers_index (verse_key -> pericopes) powers "the Fathers on this verse"; it is
+    # small, so it rides in core. The full fragment text rides in a lazily-loaded
+    # bundle (catena.json), like bodies.json, keyed by pericope id.
+    catena = load_catena()
+    fathers_index = load_graph("fathers_index")
+    catena_bundle = {
+        n["id"]: {
+            "cit": n["citation"],
+            "path": n.get("path", []),
+            "lemma": n.get("lemma", ""),
+            # [father, text] pairs, in the order Aquinas chained them
+            "segs": [[s.get("father", ""), s["text"]] for s in n["segments"]],
+            "refs": [c["raw"] for c in n.get("citations_out", [])],
+        }
+        for n in catena
+    }
+    distinct_fathers = {s.get("father", "") for n in catena for s in n["segments"]}
+    distinct_fathers.discard("")
+    fragments = sum(len(n["segments"]) for n in catena)
+    # most-glossed Scripture: Gospel verses the Fathers weigh in on most heavily, by
+    # number of distinct Fathers across the pericope(s) that comment on them.
+    gloss_weight: dict[str, int] = {}
+    for n in catena:
+        nfathers = len({s.get("father", "") for s in n["segments"]} - {""})
+        for vk in n.get("commented_verse_keys", []):
+            gloss_weight[vk] = gloss_weight.get(vk, 0) + nfathers
+    most_glossed = [
+        {"key": k, "ref": f"{slug_names.get(k.split('/')[0], k.split('/')[0])} "
+                          f"{k.split('/')[1]}:{k.split('/')[2]}", "count": c}
+        for k, c in sorted(gloss_weight.items(), key=lambda kv: -kv[1])[:12]
+    ]
+
     core = {
         "meta": {
             "articles": len(arts),
@@ -92,6 +138,9 @@ def main() -> None:
             "cited_verse_keys": stats.get("unique_verse_keys", len(cited)),
             "verses_en": len(en),
             "verses_la": len(la),
+            "catena_pericopes": len(catena),
+            "catena_fragments": fragments,
+            "catena_fathers": len(distinct_fathers),
         },
         "book_slugs": book_slugs,
         "slug_names": slug_names,
@@ -100,9 +149,11 @@ def main() -> None:
         "article_refs": load_graph("article_refs"),
         "internal_refs": load_graph("internal_refs"),
         "internal_cited_by": load_graph("internal_cited_by"),
+        "fathers_index": fathers_index,
         "stats": {
             "most_cited_books": stats.get("most_cited_books", []),
             "most_cited_verses": stats.get("most_cited_verses", []),
+            "most_glossed_verses": most_glossed,
             # enrich with the article id so the explorer can link straight to it
             "most_cited_articles": [
                 {**a, "id": cit2id.get(a.get("citation"), "")}
@@ -114,17 +165,22 @@ def main() -> None:
 
     core_path = os.path.join(OUT, "core.json")
     bodies_path = os.path.join(OUT, "bodies.json")
+    catena_path = os.path.join(OUT, "catena.json")
     with open(core_path, "w", encoding="utf-8") as f:
         json.dump(core, f, ensure_ascii=False, separators=(",", ":"))
     with open(bodies_path, "w", encoding="utf-8") as f:
         json.dump(bodies, f, ensure_ascii=False, separators=(",", ":"))
+    with open(catena_path, "w", encoding="utf-8") as f:
+        json.dump(catena_bundle, f, ensure_ascii=False, separators=(",", ":"))
 
-    for label, p in [("core", core_path), ("bodies", bodies_path)]:
+    for label, p in [("core", core_path), ("bodies", bodies_path), ("catena", catena_path)]:
         mb = os.path.getsize(p) / 1e6
         print(f"wrote explorer/data/{label}.json  ({mb:.2f} MB)")
     print(f"articles: {len(arts)}  cited verses (EN+LA): {len(verses)}  "
           f"scripture edges: {core['meta']['scripture_edges']}  "
           f"internal edges: {core['meta']['internal_edges']}")
+    print(f"catena: {len(catena)} pericopes  {fragments} fragments  "
+          f"{len(distinct_fathers)} Fathers  {len(fathers_index)} glossed verses")
 
 
 if __name__ == "__main__":

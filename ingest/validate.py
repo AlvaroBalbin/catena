@@ -38,11 +38,18 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SUMMA = os.path.join(ROOT, "data", "summa")
+CATENA = os.path.join(ROOT, "data", "catena")
 BIBLE = os.path.join(ROOT, "data", "bible", "drb")
 VULGATE = os.path.join(ROOT, "data", "bible", "vg")
 
 CIT = re.compile(r"^ST (I|I-II|II-II|III|Suppl\.), q\.(\d+), a\.(\d+)$")
 ID = re.compile(r"^summa\.st\.(i|i-ii|ii-ii|iii|suppl)\.q(\d+)\.a(\d+)$")
+
+# Catena: id -> (slug, chapter, start-verse); citation -> (book, chapter, verses)
+CATENA_GOSPELS = {"matthew": "Matthew", "mark": "Mark", "luke": "Luke", "john": "John"}
+CATENA_CHAPTERS = {"matthew": 28, "mark": 16, "luke": 24, "john": 21}
+CAT_ID = re.compile(r"^catena\.(matthew|mark|luke|john)\.(\d+)\.(\d+)$")
+CAT_CIT = re.compile(r"^Catena Aurea, (Matthew|Mark|Luke|John) (\d+):(\d+)(?:-(\d+))?$")
 
 
 def fail(msg: str) -> None:
@@ -304,10 +311,105 @@ def validate_vulgate() -> None:
               "(lossless-vs-source skipped: source cache absent)")
 
 
+def validate_catena() -> None:
+    files = sorted(glob.glob(os.path.join(CATENA, "*.jsonl")))
+    if not files:
+        print("Catena Aurea: not ingested (skipped)")
+        return
+
+    # golden-chain join target: every commented verse must be a real DRB verse.
+    drb_files = sorted(glob.glob(os.path.join(BIBLE, "*.jsonl")))
+    if not drb_files:
+        fail("Catena join-key check needs the Douay-Rheims Bible; ingest it first")
+    drb_keys: set[str] = set()
+    for path in drb_files:
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                drb_keys.add(json.loads(line)["verse_key"])
+
+    ids: set[str] = set()
+    total = 0
+    frags = 0
+    by_gospel: dict[str, set[int]] = {}
+
+    for path in files:
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            n = json.loads(line)
+            total += 1
+            nid = n["id"]
+
+            if nid in ids:
+                fail(f"duplicate id {nid}")
+            ids.add(nid)
+
+            if n.get("type") != "father-comment":
+                fail(f"unexpected type {n.get('type')!r} on {nid}")
+            if not n.get("text", "").strip():
+                fail(f"empty text: {nid}")
+
+            src = n.get("source") or {}
+            if not src.get("license"):
+                fail(f"missing license: {nid}")
+
+            # lossless: segments rejoin to text exactly
+            segs = n.get("segments", [])
+            if not segs:
+                fail(f"no segments: {nid}")
+            frags += len(segs)
+            if "\n\n".join(s["text"] for s in segs) != n["text"]:
+                fail(f"lossless invariant broken: {nid}")
+            for s in segs:
+                if not s.get("father"):
+                    fail(f"segment without a Father on {nid}")
+
+            # id <-> citation agreement
+            im = CAT_ID.match(nid)
+            if not im:
+                fail(f"unparseable id {nid}")
+            cm = CAT_CIT.match(n["citation"])
+            if not cm:
+                fail(f"unparseable citation {n['citation']!r} on {nid}")
+            slug, ich, iv = im.group(1), im.group(2), im.group(3)
+            if CATENA_GOSPELS[slug] != cm.group(1) or ich != cm.group(2) or iv != cm.group(3):
+                fail(f"id/citation mismatch: {nid} vs {n['citation']}")
+
+            # join-key integrity: every commented verse resolves in the DRB
+            cvk = n.get("commented_verse_keys", [])
+            if not cvk:
+                fail(f"no commented_verse_keys: {nid}")
+            for vk in cvk:
+                if vk not in drb_keys:
+                    fail(f"commented verse {vk} on {nid} is not a real DRB verse")
+                if vk.split("/")[0] != slug:
+                    fail(f"commented verse {vk} on {nid} is outside its gospel")
+
+            by_gospel.setdefault(slug, set()).add(int(ich))
+
+    # completeness: all four gospels, every chapter present, none empty
+    for slug, expected in CATENA_CHAPTERS.items():
+        if slug not in by_gospel:
+            fail(f"missing gospel: {slug}")
+        gaps = set(range(1, expected + 1)) - by_gospel[slug]
+        if gaps:
+            fail(f"{slug}: missing chapters {sorted(gaps)}")
+    present_chapters = sum(len(v) for v in by_gospel.values())
+    if present_chapters != sum(CATENA_CHAPTERS.values()):
+        fail(f"expected {sum(CATENA_CHAPTERS.values())} chapters, saw {present_chapters}")
+
+    print(f"Catena Aurea OK: {total} pericopes, {len(ids)} unique ids, {frags} fragments; "
+          f"{present_chapters} chapters across {len(by_gospel)} gospels; "
+          "segments rejoin to text and every commented verse resolves in the DRB")
+
+
 def main() -> None:
     validate_summa()
     validate_bible()
     validate_vulgate()
+    validate_catena()
     print("lossless, addressable, and complete for the ingested corpus.")
 
 
