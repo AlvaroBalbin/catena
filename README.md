@@ -12,6 +12,21 @@ The name is from the *Catena Aurea*, Aquinas's "golden chain" of sourced quotati
 
 **[Open the explorer &#8594;](https://alvarobalbin.github.io/catena/explorer/)** - ask a question and read the actual passages Aquinas wrote, verbatim and cited; walk the chain of Scripture behind them, in English and the Latin Vulgate; watch it refuse when the corpus does not contain the answer. It runs entirely in your browser over the open data in this repo - no server, no key, nothing you type leaves the page.
 
+## Load the dataset (Hugging Face)
+
+The corpus is published as a dataset on the Hugging Face Hub, loadable in one line - the Summa, both Bibles, and the citation graph as tabular edges:
+
+```python
+from datasets import load_dataset
+
+summa  = load_dataset("TheAlvaroBalbin/catena", "summa")               # 3,115 articles
+verses = load_dataset("TheAlvaroBalbin/catena", "douay_rheims")        # 35,786 verses (English)
+latin  = load_dataset("TheAlvaroBalbin/catena", "clementine_vulgate")  # 35,809 verses (Latin)
+edges  = load_dataset("TheAlvaroBalbin/catena", "scripture_edges")     # article -> verse citation graph
+```
+
+Dataset: **https://huggingface.co/datasets/TheAlvaroBalbin/catena**
+
 ## What this is (and is not)
 
 - **It is a dataset + a reference retrieval demo.** The dataset is the deliverable. The demo exists to prove the discipline (grounded, cited, refuses to hallucinate), not to be a product.
