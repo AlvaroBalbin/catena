@@ -73,6 +73,13 @@ def load_catena() -> list[dict]:
     return out
 
 
+def load_lectionary() -> dict:
+    """date (YYYY-MM-DD) -> the day's Mass Gospel reference, so the explorer can show
+    'the Fathers on today's Gospel'. Empty until data/lectionary/gospels.json exists."""
+    p = os.path.join(DATA, "lectionary", "gospels.json")
+    return json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {}
+
+
 def load_catechism() -> list[dict]:
     """The Roman Catechism (Catechism of the Council of Trent), one node per subsection.
     Doctrinal prose - folded into the searchable/readable passage set beside the Summa."""
@@ -110,6 +117,11 @@ def main() -> None:
     en = load_verse_text("drb")
     la = load_verse_text("vg")
     verses = {k: [en.get(k, ""), la.get(k, "")] for k in cited}
+    # include the full text of the four Gospels (English + Latin), so "today's Gospel"
+    # and the Fathers' chains read in full - not only the verses the Summa happens to cite.
+    for k in en:
+        if k.split("/")[0] in ("matthew", "mark", "luke", "john"):
+            verses[k] = [en.get(k, ""), la.get(k, "")]
 
     # book name/abbreviation -> slug, straight from the citation normalizer, so the
     # explorer resolves "John 1:14", "Jn 1:14", "Osee 1" the same way the corpus does.
@@ -170,6 +182,7 @@ def main() -> None:
         "internal_refs": load_graph("internal_refs"),
         "internal_cited_by": load_graph("internal_cited_by"),
         "fathers_index": fathers_index,
+        "lectionary": load_lectionary(),
         "stats": {
             "most_cited_books": stats.get("most_cited_books", []),
             "most_cited_verses": stats.get("most_cited_verses", []),

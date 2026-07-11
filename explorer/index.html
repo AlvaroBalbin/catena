@@ -107,6 +107,14 @@
      letter-spacing:.02em;padding-top:5px;line-height:1.35}
   .father .ftext{grid-column:2;font-family:var(--serif);font-size:18px;line-height:1.66}
 
+  /* a Scripture reading set as continuous prose with rubricated verse numbers */
+  .reading{margin:16px 0 8px;font-family:var(--serif);font-size:19px;line-height:1.74;max-width:38em}
+  .reading .vn{font-family:var(--mono);font-size:10px;color:var(--rubric);
+     vertical-align:super;margin:0 5px 0 2px;letter-spacing:0}
+  .today-when{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);
+     text-transform:uppercase;margin-bottom:6px}
+  .today-when b{color:var(--rubric);font-weight:600}
+
   /* an editorial note, not an alert */
   .refuse{border-left:2px solid var(--rubric);padding:4px 0 4px 20px;color:var(--ink);font-size:17px;line-height:1.55}
   .refuse b{display:block;margin-bottom:5px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
@@ -261,7 +269,15 @@ function renderLanding(){
     <div class="note">Aquinas's <i>Catena Aurea</i> - the Church Fathers, verse by verse, on the four
       Gospels. The verses they weigh in on most heavily, by how many Fathers speak.</div>
     <div class="chips">${glossed}</div>` : "";
+  const hasLectionary = Object.keys(CORE.lectionary||{}).length > 0;
+  const todayEntry = hasLectionary ? `
+    <a class="row" href="#/today" style="border-top:0;padding-top:2px">
+      <div class="cite">Daily</div>
+      <div class="title">The Fathers on today's Gospel &#8594;</div>
+      <div class="snip">The Church Fathers, verbatim and cited, on the Gospel read at Mass today - Aquinas's golden chain for prayer, study, or the homily.</div>
+    </a>` : "";
   view.innerHTML = `
+    ${todayEntry}
     <div class="section-title">Try asking</div><div class="chips">${examples}</div>
     ${goldenChain}
     <div class="section-title">The load-bearing arguments of the Summa</div>
@@ -415,6 +431,75 @@ async function renderCatena(id){
   scrollTo(0,0);
 }
 
+// ---- the Fathers on today's Gospel -------------------------------------------
+// parse a lectionary Gospel reference ("Luke 10:25-37", "Luke 15:1-3, 11-32") into the
+// verse keys we hold. Single-chapter with comma segments covers the ordinary case.
+function parseGospel(ref){
+  const m = (ref||"").match(/^\s*([1-4]?\s*[A-Za-z][A-Za-z.'\s]*?)\s+(\d+)\s*:\s*(.+)$/);
+  if(!m) return null;
+  const slug = CORE.book_slugs[m[1].toLowerCase().replace(/[\s.]/g,"")];
+  if(!slug) return null;
+  const ch=+m[2], keys=[];
+  for(const seg of m[3].split(",")){
+    const r = seg.trim().match(/^(\d+)(?:\s*[-–]\s*(\d+))?/);
+    if(!r) continue;
+    const a=+r[1], b=r[2]?+r[2]:a;
+    for(let v=a; v<=b; v++){ const k=`${slug}/${ch}/${v}`; if(CORE.verses[k]!==undefined) keys.push(k); }
+  }
+  return {slug, ch, keys};
+}
+function isoLocal(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+
+function renderToday(){
+  const lec = CORE.lectionary||{};
+  const keysAvail = Object.keys(lec).sort();
+  if(!keysAvail.length){
+    view.innerHTML = `<div class="note">The lectionary is not loaded in this build, so
+      today's Gospel is unavailable. Every Gospel verse still carries the Fathers - open one,
+      e.g. <span class="link" data-go="#/v/john/1/14">John 1:14</span>.</div>`;
+    return scrollTo(0,0);
+  }
+  const today = isoLocal(new Date());
+  // today's reading, or the next dated reading we hold (so it is always useful)
+  let date = lec[today] ? today : (keysAvail.find(k=>k>=today) || keysAvail[keysAvail.length-1]);
+  const entry = lec[date];
+  const when = new Date(date+"T00:00:00").toLocaleDateString(undefined,
+     {weekday:"long", year:"numeric", month:"long", day:"numeric"});
+  const notToday = date!==today ? " (next reading in the calendar)" : "";
+  const g = parseGospel(entry.gospel);
+
+  const readingHtml = (g && g.keys.length)
+    ? `<div class="reading">`+g.keys.map(k=>{
+        const t=(CORE.verses[k]||[])[0]||""; const v=k.split("/")[2];
+        return `<span class="vn">${v}</span>${esc(t)} `; }).join("")+`</div>`
+    : `<div class="note">The text for this reference is outside the four Gospels in this bundle.</div>`;
+
+  // the Fathers' chains covering this Gospel, deduped across the reading's verses
+  const seen=new Set(), chains=[];
+  for(const k of (g? g.keys: [])){
+    for(const f of (CORE.fathers_index[k]||[])){
+      if(!seen.has(f.id)){ seen.add(f.id); chains.push(f); }
+    }
+  }
+  const chainsHtml = chains.length
+    ? `<div class="section-title">The Fathers on this Gospel</div>`+
+      chains.map(f=>`<a class="row" href="#/c/${encodeURIComponent(f.id)}">
+        <div class="cite">${esc((f.citation||"").replace(/^Catena Aurea,\s*/,""))}</div>
+        <div class="title">Aquinas's golden chain</div>
+        <div class="snip">${esc(f.father_summary||"")}</div></a>`).join("")
+    : `<div class="note">The Catena Aurea does not comment on this passage.</div>`;
+
+  view.innerHTML = `<div class="article">
+    <div class="today-when">Today &middot; <b>${esc(when)}</b>${entry.day?` &middot; ${esc(entry.day)}`:""}${entry.cycle?` &middot; Year ${esc(entry.cycle)}`:""}${notToday}</div>
+    <h2>The Gospel: ${esc(entry.gospel)}</h2>
+    ${readingHtml}
+    <div class="hint ui" style="margin:10px 0 2px">Read verbatim from the Douay-Rheims; the Fathers below are Aquinas's Catena Aurea, each quotation attributed and cited.</div>
+    <div style="height:14px"></div>
+    ${chainsHtml}
+  </div>`;
+  scrollTo(0,0);
+}
+
 // ---- input + routing ----
 function ask(text){ qEl.value=text; submit(); }
 window.ask=ask; window.go=go;
@@ -436,6 +521,7 @@ document.addEventListener("click",e=>{
 function route(){
   if(!CORE) return;
   const h=location.hash.replace(/^#\/?/,"");
+  if(h==="today")            return renderToday();
   if(h.startsWith("a/"))      return renderArticle(decodeURIComponent(h.slice(2)));
   if(h.startsWith("c/"))      return renderCatena(decodeURIComponent(h.slice(2)));
   if(h.startsWith("v/"))      return renderVerse(h.slice(2));
